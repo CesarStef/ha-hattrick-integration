@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.sensor import (
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
@@ -19,7 +20,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import DOMAIN
 from .coordinator import HattrickDataUpdateCoordinator
 from .entity import HattrickEntity
-from .models import HattrickData
+from .models import HattrickData, htt_to_aware
 
 StateValue = str | int | float | None
 
@@ -179,6 +180,111 @@ SENSORS: tuple[HattrickSensorEntityDescription, ...] = (
             if data.club
             else {}
         ),
+    ),
+    HattrickSensorEntityDescription(
+        key="posizione",
+        translation_key="posizione",
+        icon="mdi:podium",
+        value_fn=lambda data: data.league.position if data.league else None,
+        attrs_fn=lambda data: (
+            {
+                "lega": data.team.league_name,
+                "girone": data.league.league_level_unit_name,
+                "livello": data.league.league_level,
+                "giornata": data.league.current_round,
+                "numero_squadre": data.league.max_teams,
+            }
+            if data.league
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="prossima_partita",
+        translation_key="prossima_partita",
+        icon="mdi:calendar-clock",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=lambda data: (
+            htt_to_aware(data.matches.next_match.date)
+            if data.matches and data.matches.next_match
+            else None
+        ),
+        attrs_fn=lambda data: (
+            {
+                "match_id": data.matches.next_match.match_id,
+                "avversario": data.matches.next_match.opponent(data.team.team_id),
+                "casa_trasferta": "casa"
+                if data.matches.next_match.is_home(data.team.team_id)
+                else "trasferta",
+                "tipo": data.matches.next_match.match_type_label,
+                "stadio": data.matches.next_match.arena_name,
+            }
+            if data.matches and data.matches.next_match
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="ultima_partita",
+        translation_key="ultima_partita",
+        icon="mdi:scoreboard",
+        value_fn=lambda data: (
+            data.matches.last_match.score(data.team.team_id)
+            if data.matches and data.matches.last_match
+            else None
+        ),
+        attrs_fn=lambda data: (
+            {
+                "match_id": data.matches.last_match.match_id,
+                "avversario": data.matches.last_match.opponent(data.team.team_id),
+                "data": htt_to_aware(data.matches.last_match.date).isoformat(),
+                "tipo": data.matches.last_match.match_type_label,
+                "casa_trasferta": "casa"
+                if data.matches.last_match.is_home(data.team.team_id)
+                else "trasferta",
+            }
+            if data.matches and data.matches.last_match
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="partite_programmate",
+        translation_key="partite_programmate",
+        icon="mdi:calendar-multiple",
+        value_fn=lambda data: len(data.matches.upcoming) if data.matches else None,
+        attrs_fn=lambda data: (
+            {
+                "prossime": [
+                    {
+                        "data": htt_to_aware(m.date).isoformat(),
+                        "avversario": m.opponent(data.team.team_id),
+                        "casa_trasferta": "casa" if m.is_home(data.team.team_id) else "trasferta",
+                        "tipo": m.match_type_label,
+                        "match_id": m.match_id,
+                    }
+                    for m in data.matches.upcoming[:5]
+                ]
+            }
+            if data.matches
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="entrate_previste",
+        translation_key="entrate_previste",
+        icon="mdi:cash-plus",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: data.economy.expected_cash,
+        attrs_fn=lambda data: {
+            "sponsor": data.economy.sponsors,
+            "stipendi": data.economy.wages,
+        },
+    ),
+    HattrickSensorEntityDescription(
+        key="stipendi",
+        translation_key="stipendi",
+        icon="mdi:cash-minus",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: data.economy.wages,
     ),
 )
 

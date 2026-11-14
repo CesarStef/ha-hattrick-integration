@@ -140,3 +140,38 @@ async def test_sensor_club(hass: HomeAssistant):
     assert staff.state == "3"
     assert staff.attributes["medico"]["livello"] == 4
     assert staff.attributes["psicologo"]["nome"] == "Sig.ra Calma"
+
+
+async def test_sensor_classifica(hass: HomeAssistant):
+    await _setup_entry(hass)
+    posizione = _state(hass, "posizione")
+    assert posizione.state == "3"
+    assert posizione.attributes["girone"] == "Serie Test"
+    assert posizione.attributes["giornata"] == 5
+    assert posizione.attributes["numero_squadre"] == 8
+
+
+async def test_sensor_partite(hass: HomeAssistant):
+    await _setup_entry(hass)
+    prossima = _state(hass, "prossima_partita")
+    assert prossima.attributes["match_id"] == 9002
+    assert prossima.attributes["avversario"] == "Altra Squadra"
+    assert prossima.attributes["casa_trasferta"] == "trasferta"
+    assert prossima.attributes["tipo"] == "lega"
+    # 19:30 HTT (CET, UTC+1 a novembre) -> 18:30 UTC nello stato HA
+    assert prossima.state == "2026-11-14T18:30:00+00:00"
+    ultima = _state(hass, "ultima_partita")
+    assert ultima.state == "3-1"
+    assert ultima.attributes["avversario"] == "Avversari FC"
+    assert ultima.attributes["casa_trasferta"] == "casa"
+    programmate = _state(hass, "partite_programmate")
+    assert programmate.state == "2"
+    assert len(programmate.attributes["prossime"]) == 2
+    assert programmate.attributes["prossime"][1]["tipo"] == "coppa"
+
+
+async def test_sensor_economia_estesa(hass: HomeAssistant):
+    await _setup_entry(hass)
+    assert _state(hass, "entrate_previste").state == "4800000"
+    assert _state(hass, "entrate_previste").attributes["stipendi"] == 350000
+    assert _state(hass, "stipendi").state == "350000"
