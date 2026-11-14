@@ -6,10 +6,12 @@ esattamente da dove ripartire. Aggiornarlo a ogni milestone.
 ## 1. Stato del repository
 
 - Branch `main`, remote `origin` = `https://github.com/CesarStef/ha-hattrick-integration.git`
-- Ultimo commit su main: `53e0433`. Tag `v0.6.0` pushato.
-- **Milestone M6 completata**: 4 servizi, 23 sensor, esempi + mock HTML
-  (`examples/mockups/`), diagnostics redatta, repair token revocato,
-  89 test verdi, coverage 97%.
+- Ultimo commit su main: `d22159f`. Tag `v1.0.0` pushato (tutti i tag v0.1.0–v1.0.0 su origin).
+- **M7 rilasciata (v1.0.0)** e **M8 in preparazione**: 4 servizi, 23 sensor, esempi +
+  mock HTML, diagnostics redatta, repair token revocato, 90 test verdi, coverage 97%.
+- Attenzione: i **tag** sono su origin ma le **GitHub Release** no (il connettore
+  disponibile non le crea): crearle dall'UI GitHub dai tag, altrimenti
+  Marketplace/HACS installano il branch main invece della release.
 
 ```
 ha-hattrick-integration/
@@ -21,7 +23,7 @@ ha-hattrick-integration/
 │                                  #   pytest-homeassistant-custom-component, requests-oauthlib
 ├── .github/workflows/             # hassfest.yaml, hacs.yaml
 ├── custom_components/hattrick/
-│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.6.0
+│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 1.0.0
 │   ├── const.py                   # endpoint CHPP, CONF_*, FILE_VERSIONS, ON_DEMAND_FILES,
 │   │                              #   SELECTABLE_FILES, intervalli, matchday
 │   ├── api.py                     # HattrickCHPPClient (OAuth 1.0a) + HattrickApiError/AuthError
@@ -48,6 +50,8 @@ ha-hattrick-integration/
 │   └── translations/{en,it}.json
 ├── docs/                          # 01-11 documentazione + piano + handoff + richiesta CHPP
 ├── examples/                      # dashboard.yaml + automations.yaml + mockups/index.html (M5)
+├── docs/12-release-notes-v1.0.0.md  # note release v1.0.0 (da incollare nella GitHub Release)
+├── docs/13-privacy-policy.md      # privacy policy per la certificazione CHPP
 └── tests/
     ├── conftest.py                # sys.path + auto_enable_custom_integrations
     ├── fixtures/                  # 14 XML (aggiunti matchdetails.xml, matchlineup.xml)
@@ -164,12 +168,15 @@ Baseline attesa: **89 passed**, coverage ~97%.
 
 ## 5. Cosa resta da fare (prossimi passi, in ordine)
 
-1. **T25 (M7)**: release `v1.0.0` con release notes; verifica che Marketplace/HACS
-   installino la release in HA pulita (su HA 2026.11 il Marketplace prende la
-   release se esiste, altrimenti main).
-2. **T26 (M8)**: certificazione CHPP (testo pronto in `docs/11`, ma
-   **ricontrollare la policy CHPP sull'AI**: a maggio 2026 Hattrick ha rifiutato
-   un'app generata da AI) — vedi `docs/09-piano-di-lavoro.md`.
+1. **Creare le GitHub Release dai tag** (UI GitHub → Releases → "Draft a new release"):
+   senza l'oggetto Release, Marketplace/HACS installano main invece della versione
+   fissata. Note pronte in `docs/12-release-notes-v1.0.0.md` per v1.0.0.
+2. **T26 (M8)**: inviare la domanda di certificazione CHPP con il testo di `docs/11`
+   (privacy policy in `docs/13`). **Bloccante**: chiedere prima agli admin CHPP se il
+   codice generato da AI (senza feature AI a runtime) è ammissibile — a maggio 2026
+   Hattrick ha rifiutato un'app con uso AI. Poi aggiornare `docs/11` con la risposta.
+3. Collaudo reale su HA 2026.11.1 con account CHPP: riconfermare `FILE_VERSIONS` e i
+   nomi campi XML di `matchorders.xml` contro le risposte reali.
 
 ## 6. Attenzioni e note tecniche
 
@@ -196,6 +203,6 @@ Baseline attesa: **89 passed**, coverage ~97%.
 
 ## 8. Come riprendere
 
-Chiedere: *"procedi con T25"* (o l'ultimo task in sospeso). Ricostruire il venv
-(sezione 2), lanciare `pytest -q` per confermare la baseline 89 passed, poi
+Chiedere: *"procedi con T26"* (o l'ultimo task in sospeso). Ricostruire il venv
+(sezione 2), lanciare `pytest -q` per confermare la baseline 90 passed, poi
 lavorare al task e committare. Push solo a fine milestone (tag SemVer).

@@ -10,6 +10,9 @@ Piano operativo per lo sviluppo dell'integrazione, derivato dalla roadmap in
 Test: 90 passed. Coverage totale 97% (coordinator 100%, services 100%,
 entity 100%, const 100%, config_flow 96%, diagnostics 94%, models 98%,
 sensor 98%, `__init__` 97%, api 88%, repairs 83%).
+**M8 in preparazione**: domanda di certificazione pronta in `docs/11`, privacy policy in
+`docs/13`; invio bloccato sulla policy AI di Hattrick (maggio 2026: AI non consentita
+nelle app CHPP — da chiarire se vale anche per codice generato da AI senza feature AI).
 
 | Task | Stato | Commit |
 |------|-------|--------|
@@ -37,9 +40,10 @@ sensor 98%, `__init__` 97%, api 88%, repairs 83%).
 | T22 | fatto | `bdb7561` (README utente: installazione, config, FAQ) |
 | T23 | fatto | `941480d` (test suite completa: 86 test, coverage 97%) |
 | T24 | fatto | `53e0433` (diagnostics redatta + repair token revocato) |
-| T25 | fatto | release `v1.0.0`: User-Agent CHPP, release notes, tag pushato |
+| T25 | fatto | `d22159f` (release `v1.0.0`: User-Agent CHPP, release notes, tag pushato) |
+| T26 | preparato | `docs/11` + checklist + `docs/13` privacy policy; invio a carico del proprietario dell'app CHPP (bloccante: policy AI, vedi docs/11) |
 
-**Prossimo task: T26 (M8, certificazione CHPP).** Per riprendere il lavoro in una
+**Progetto completato fino a M8-preparazione.** Per riprendere il lavoro in una
 nuova sessione vedi `docs/10-handoff-nuova-sessione.md`.
 
 ## Convenzioni di lavoro

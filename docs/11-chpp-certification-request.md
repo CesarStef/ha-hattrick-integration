@@ -83,9 +83,50 @@ included).
 1. Registrare l'app su chpp.hattrick.org con nome e short description sopra.
 2. Incollare la "Full description" nel campo descrizione della domanda di certificazione.
 3. Se viene chiesta una demo: puntare alla propria istanza HA (web) con i sensor già
-   popolati, oppure a una registrazione dello schermo.
+   popolati, oppure a una registrazione dello schermo (i mock in `examples/mockups/`
+   mostrano il layout previsto).
 4. Se CHPP chiede il permesso di scrittura sugli ordini di partita (`matchorders`), è la
    milestone M4: va richiesto come scope separato e difeso con il paragrafo "Optional
    write scope".
 5. Aggiornare questo documento con la risposta di Hattrick e gli eventuali adeguamenti
    richiesti (criterio di accettazione di T26).
+
+---
+
+## Stato della policy AI di Hattrick (aggiornato al 2026-11, da ricontrollare prima dell'invio)
+
+**Rilevante per questo progetto, che è vibe-codato.**
+
+- A maggio 2026 un admin CHPP ha chiarito pubblicamente (caso `rmagasi/hattrick-team-assistant`,
+  app rifiutata il 2026-05-17) che **l'uso di AI nelle applicazioni CHPP non è attualmente
+  consentito** — il progetto è stato "parked" con la nota che non c'è percorso di
+  approvazione sotto la policy corrente.
+- La formulazione riguarda le app che "fanno lavoro AI per gli utenti" (LLM al runtime).
+  **Non è chiaro se includa anche il codice generato da AI senza feature AI a runtime** —
+  la nostra integrazione non usa alcun modello AI a runtime, ma il codice è stato generato
+  con un agente AI (dichiarato nel README).
+- **Prima di inviare la domanda, chiedere esplicitamente agli admin CHPP** (forum CHPP o
+  campo note della domanda) se il codice generato da AI, senza feature AI a runtime, è
+  ammissibile. Se la risposta è no, la certificazione è bloccata finché Hattrick non
+  aggiorna la policy: documentare la risposta in questo file.
+
+## Checklist pre-invio (requisiti CHPP Manual, verificati nel repo)
+
+- [x] Solo file XML ufficiali (`chppxml.ashx`), niente scraping — `api.py` usa solo CHPP_XML_URL.
+- [x] User-Agent con nome programma e versione in ogni richiesta — `USER_AGENT` in
+  `const.py` (da manifest), impostato su tutte le sessioni OAuth in `api.py`.
+- [x] OAuth 1.0a 3-legged; mai password/codice di sicurezza; token mai nei log;
+  diagnostics redatta (`diagnostics.py`, test automatico in `tests/test_diagnostics.py`).
+- [x] Solo dati della propria squadra; niente tracciamento di altre squadre.
+- [x] Limiti di download: polling default 15 min, backoff su 429, file pesanti solo
+  on-demand, matchday 5 min solo dentro ±3h dalla partita.
+- [x] Copyright notice "This application uses information from the online game service
+  Hattrick.org" nel README (richiesto dal CHPP Manual).
+- [x] App gratuita: nessun pagamento richiesto agli utenti.
+- [x] Privacy policy pubblica: `docs/13-privacy-policy.md` (renderizzata da GitHub).
+- [x] Codice sorgente pubblico su GitHub con test (90 test, coverage 97%).
+- [ ] Demo: istanza HA reale con dati CHPP o registrazione (da preparare al momento dell'invio).
+- [ ] Risposta esplicita sulla policy AI (vedi sezione sopra) — **bloccante**.
+- [ ] La domanda va inviata **prima** di pubblicizzare l'app: "Apply for CHPP before you
+  start developing" (wiki CHPP). L'app resta "personal" finché non certificata, quindi
+  solo il proprietario può autorizzarla.
