@@ -22,6 +22,7 @@ automazioni.
 | [docs/07-sviluppo-test-debug.md](docs/07-sviluppo-test-debug.md) | Ambiente di sviluppo, comandi utili, test automatici, hassfest/HACS, debug |
 | [docs/08-sicurezza-regole-roadmap.md](docs/08-sicurezza-regole-roadmap.md) | Sicurezza e privacy, regole CHPP da rispettare, roadmap di sviluppo |
 | [docs/09-piano-di-lavoro.md](docs/09-piano-di-lavoro.md) | Piano operativo: task T1–T26, dipendenze, criteri di accettazione, milestone M1–M8 |
+| [docs/10-handoff-nuova-sessione.md](docs/10-handoff-nuova-sessione.md) | Stato attuale del repo, ambiente di test, comandi rapidi e da dove ripartire (handoff) |
 
 ## Stato del progetto
 

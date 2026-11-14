@@ -4,6 +4,29 @@ Piano operativo per lo sviluppo dell'integrazione, derivato dalla roadmap in
 `docs/08`. Stato attuale: **documentazione di progettazione completata** (commit
 `e1424d2`). Da qui in poi si passa al codice.
 
+## Stato di avanzamento (aggiornato al 2026-11-14)
+
+**M1 completata e rilasciata**: tag `v0.1.0`, pushato su `origin/main`
+(ultimo commit `38f17e4`). Test: 26 passed. Coverage totale 90%
+(coordinator 100%, config_flow 85%, sensor/entity 100%, models 97%,
+`__init__` 96%, api 74%).
+
+| Task | Stato | Commit |
+|------|-------|--------|
+| T1 | fatto | `571cf9b` |
+| T2 | fatto | `fdb0b1c` |
+| T3 | fatto | `a7c3a6e` |
+| T4 | fatto | `f35263d` |
+| T5 | fatto | `f693913` + `dea2a72` (fix parsing tollerante) |
+| T6 | fatto | `d9e7657` |
+| T7 | fatto | `bfc6789` |
+| T8 | fatto | `67a1933` |
+| T9 | fatto | `38f17e4` (grep: nessun testo UI hardcoded) |
+| T10 | fatto | `38f17e4` (coverage, tag `v0.1.0`) |
+
+**Prossimo task: T11 (inizio M2).** Per riprendere il lavoro in una nuova
+sessione vedi `docs/10-handoff-nuova-sessione.md`.
+
 ## Convenzioni di lavoro
 
 - **Un commit per ogni task completato** su `main`, con messaggio che indica il task
