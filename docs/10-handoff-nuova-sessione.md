@@ -6,63 +6,69 @@ esattamente da dove ripartire. Aggiornarlo a ogni milestone.
 ## 1. Stato del repository
 
 - Branch `main`, remote `origin` = `https://github.com/CesarStef/ha-hattrick-integration.git`
-- Ultimo commit su main: `15cec8c` (pushato). Tag `v0.2.0` pushato.
-- **Milestone M2 completata**: a M1 si aggiungono parsing esteso (8 file CHPP),
-  coordinator multi-file, 17 sensor totali (rosa, club, classifica, partite,
-  economia, allenamento, stadio, mondo), options flow con modalità matchday,
-  47 test verdi, coverage 93%.
+- Ultimo commit su main: `6c228e5` (pushato). Tag `v0.3.0` pushato.
+- **Milestone M3 completata**: servizi on-demand `get_match_details`/`get_player`
+  con risposta, sensor diagnostici ultima partita (matchdetails/matchlineup),
+  23 sensor totali, 59 test verdi, coverage 94%.
 
 ```
 ha-hattrick-integration/
-├── README.md
+├── README.md                      # include disclaimer "progetto vibe-codato"
 ├── LICENSE                        # Apache License 2.0
 ├── hacs.json
-├── pyproject.toml                 # ruff (py313, line-length 100) + pytest
+├── pyproject.toml                 # ruff (py313, line-length 100) + pytest, license Apache-2.0
 ├── requirements_test.txt          # ruff, pytest, pytest-asyncio, pytest-cov,
 │                                  #   pytest-homeassistant-custom-component, requests-oauthlib
 ├── .github/workflows/             # hassfest.yaml, hacs.yaml
 ├── custom_components/hattrick/
-│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.2.0
-│   ├── const.py                   # endpoint CHPP, CONF_*, FILE_VERSIONS, intervalli, matchday
+│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.3.0
+│   ├── const.py                   # endpoint CHPP, CONF_*, FILE_VERSIONS, ON_DEMAND_FILES,
+│   │                              #   SELECTABLE_FILES, intervalli, matchday
 │   ├── api.py                     # HattrickCHPPClient (OAuth 1.0a) + HattrickApiError/AuthError
+│   │                              #   (wrap anche di TokenRequestDenied/ValueError)
 │   ├── models.py                  # Team, TeamMood, Economy, Player(s), LeagueDetails,
 │   │                              #   Match(es), Training, TrainingSummary, Arena, Club,
-│   │                              #   World + parser XML tollerante (HTT -> aware)
-│   ├── coordinator.py             # HattrickDataUpdateCoordinator: file base + abilitati,
-│   │                              #   matchday (5 min in finestra partita)
-│   ├── config_flow.py             # auto OAuth / manuale / reauth / options (interval,
-│   │                              #   file abilitati, matchday)
+│   │                              #   World, MatchDetails, MatchLineup + parser XML tollerante
+│   ├── coordinator.py             # file base + abilitati in parallelo, on-demand
+│   │                              #   (matchdetails/matchlineup ultima partita se abilitati),
+│   │                              #   matchday (5 min in finestra partita ±3h HTT)
+│   ├── config_flow.py             # step app (consumer key/secret) + auto OAuth / manuale /
+│   │                              #   reauth / options (interval, file abilitati incl. on-demand,
+│   │                              #   matchday)
 │   ├── entity.py                  # HattrickEntity + device_info squadra
-│   ├── sensor.py                  # 21 sensor (vedi docs/04 §1–§8)
-│   ├── __init__.py                # setup/unload entry, client+coordinator, PLATFORMS=[SENSOR]
+│   ├── sensor.py                  # 23 sensor (vedi docs/04 §1–§8 + diagnostici M3)
+│   ├── services.py                # servizi get_match_details / get_player (supports_response ONLY)
+│   ├── services.yaml              # schema servizi (match_id/player_id/config_entry)
+│   ├── __init__.py                # setup/unload entry + registrazione/rimozione servizi
 │   ├── strings.json
 │   └── translations/{en,it}.json
-├── docs/                          # 01-10 documentazione + piano + handoff
+├── docs/                          # 01-11 documentazione + piano + handoff + richiesta CHPP
 └── tests/
     ├── conftest.py                # sys.path + auto_enable_custom_integrations
-    ├── fixtures/                  # 12 XML: teamdetails, team, economy, error_auth,
-    │                              #   players, leaguedetails, matches, training,
-    │                              #   trainingsummary, arenadetails, club, worlddetails
+    ├── fixtures/                  # 14 XML (aggiunti matchdetails.xml, matchlineup.xml)
     ├── test_api.py                # 8 test client CHPP
-    ├── test_models.py             # 14 test parsing
+    ├── test_models.py             # 17 test parsing (incl. MatchDetails/MatchLineup)
     ├── test_coordinator.py        # 6 test coordinator (incl. matchday)
     ├── test_config_flow.py        # 8 test config flow + options
-    └── test_sensor.py             # 9 test sensor/device
+    ├── test_sensor.py             # 11 test sensor/device (incl. diagnostici partita)
+    └── test_services.py           # 4 test servizi on-demand
 ```
 
 Commit recenti:
 
 ```
+6c228e5 T18: sensor diagnostici dettaglio/tattica ultima partita (matchdetails/matchlineup)
+783da55 T16: servizi get_match_details/get_player con supports_response + services.yaml
+e0db589 Fix config flow: step app consumer key/secret + wrap TokenRequestDenied in HattrickAuthError
+a1b80dc docs/11: testo inglese per richiesta certificazione CHPP (M8/T26)
+e4f7b4c Disclaimer README "progetto vibe-codato"
+fcf4dfc Compatibilita HA 2026.11: OptionsFlow semplice (no OptionsFlowWithConfigEntry)
+37834f0 Licenza Apache 2.0
 15cec8c T15: opzioni scan_interval/file abilitati/modalità matchday + coordinator matchday
 c737a18 T14: sensor allenamento, stadio, mondo e allenatore
 27ba3a6 T13: sensor classifica, partite ed economia
 67c98ca T12: sensor rosa e club
 e1d70ed T11: parsing esteso (8 file CHPP) + coordinator multi-file
-38f17e4 T9+T10: traduzioni verificate e coverage M1 (tag v0.1.0)
-67a1933 T8: sensor base + setup entry completo con device squadra
-bfc6789 T7: config flow completo (auto OAuth, manuale, reauth, opzioni)
-d9e7657 T6: DataUpdateCoordinator con gestione auth/api error
-571cf9b..dea2a72 T1-T5: setup, CI, scheletro, client CHPP, modello dati
 ```
 
 ## 2. Ambiente di test (da ricreare: `/tmp` viene pulito tra sessioni)
@@ -70,23 +76,25 @@ d9e7657 T6: DataUpdateCoordinator con gestione auth/api error
 ```bash
 cd /Users/stefanocattonar/Repositories/ha-hattrick-integration
 python3 -m venv /tmp/ht-venv
-/tmp/ht-venv/bin/pip install -r requirements_test.txt homeassistant \
-    pytest-homeassistant-custom-component requests-oauthlib pytest-cov pyyaml
+/tmp/ht-venv/bin/pip install homeassistant==2025.1.4 \
+    pytest-homeassistant-custom-component==0.13.205 requests-oauthlib \
+    pytest-cov pyyaml ruff pytest pytest-asyncio voluptuous
 ```
 
-Su Python 3.12 pip risolve **HA 2025.1.4** + **pytest-homeassistant-custom-component
-0.13.205** (ultime compatibili con 3.12). In produzione l'integrazione gira su
-HA 2025.1+ (vedi `hacs.json`); il target di pyproject è py313 (HA 2026).
+Su Python 3.12 usare i **pin espliciti** sopra (NON `requirements_test.txt`,
+che punta a PHACC>=0.13.230 in conflitto): pip risolve **HA 2025.1.4** +
+**PHACC 0.13.205** (ultime compatibili con 3.12). In produzione l'integrazione
+gira su HA 2025.1+ (vedi `hacs.json`); il target di pyproject è py313 (HA 2026).
 
 ## 3. Comandi rapidi
 
 ```bash
 /tmp/ht-venv/bin/ruff check . && /tmp/ht-venv/bin/ruff format .
-/tmp/ht-venv/bin/pytest -q                                        # 47 test
+/tmp/ht-venv/bin/pytest -q                                        # 59 test
 /tmp/ht-venv/bin/pytest -q --cov=custom_components/hattrick --cov-report=term-missing
 ```
 
-Baseline attesa: **47 passed**, coverage ~93%.
+Baseline attesa: **59 passed**, coverage ~94%.
 
 ## 4. Cosa è già implementato (mappa rápida)
 
@@ -101,17 +109,23 @@ Baseline attesa: **47 passed**, coverage ~93%.
   `STAFF_TYPES` (etichette da riconfermare contro la wiki).
 - `coordinator.py`: scarica in parallelo i file base (`teamdetails`, `team`,
   `economy`) + quelli abilitati in options e assembla `HattrickData`;
+  poi, se `matchdetails`/`matchlineup` sono abilitati, scarica on-demand i
+  dettagli dell'ultima partita (`matchID=last.match_id`).
   `HattrickAuthError` → `ConfigEntryAuthFailed`, altro → `UpdateFailed`.
   Modalità matchday: se attiva e la prossima partita è entro ±3h (HTT),
   `update_interval` scende a 5 min (`MATCHDAY_INTERVAL`).
-- `config_flow.py`: step `user` (scelta auto/manuale), `manual` (4 credenziali),
-  `auth` (mostra URL authorize + campo verifier), `reauth`/`reauth_confirm`,
-  options flow (`scan_interval` 5–60 min, `enabled_files`, `matchday`).
-  Validazione via `teamdetails.xml`, `unique_id = UserID`, abort su doppioni.
-- `sensor.py`: 21 sensor con `unique_id = {team_id}_{key}`, device "squadra"
+- `config_flow.py`: step `app` (consumer key/secret CHPP), `user` (scelta
+  auto/manuale), `manual` (4 credenziali), `auth` (URL authorize + verifier),
+  `reauth`/`reauth_confirm`, options flow (`scan_interval` 5–60 min,
+  `enabled_files` incl. on-demand, `matchday`). Validazione via
+  `teamdetails.xml`, `unique_id = UserID`, abort su doppioni.
+- `sensor.py`: 23 sensor con `unique_id = {team_id}_{key}`, device "squadra"
   (`identifiers={(DOMAIN, str(team_id))}`); i diagnostici hanno
   `entity_category=DIAGNOSTIC`. I timestamp (`prossima_partita`, `server_time`)
   usano `device_class=TIMESTAMP` e datetime aware HTT.
+- `services.py`: `hattrick.get_match_details` e `hattrick.get_player` con
+  `supports_response=SupportsResponse.ONLY`, registrados una sola volta in
+  `hass.data[DOMAIN]["services_registered"]` e rimossi quando non restano entry.
 - Compatibilità HA: l'options flow usa `OptionsFlow` semplice con `config_entry`
   auto-assegnato da HA (2024.11+): funziona su 2025.1 e su 2026.11 (dove
   `OptionsFlowWithConfigEntry` è in phase-out e il setter rimosso dal 2025.12).
@@ -127,21 +141,17 @@ Baseline attesa: **47 passed**, coverage ~93%.
 
 ## 5. Cosa resta da fare (prossimi passi, in ordine)
 
-1. **T16 (M3)**: servizi `hattrick.get_match_details` e `hattrick.get_player`
-   con `supports_response=SupportsResponse.ONLY` (HA 2024.11+): nuovo
-   `services.py` + registrazione in `__init__.py`, `services.yaml`,
-   fixture `matchdetails.xml`/`players.xml` (già c'è) + test con mock client.
-2. **T17 (M3)**: la modalità matchday è già nel coordinator (T15); resta il
-   test con ora HTT simulata dentro/fuori finestra (già coperto da
-   `test_coordinator_matchday_*`) — eventualmente rifinire la finestra.
-3. **T18 (M3)**: sensor diagnostici `dettaglio_ultima_partita` e
-   `tattica_ultima_partita` da `matchdetails.xml`/`matchlineup.xml`
-   (on-demand, non nel ciclo standard) + fixture + test.
-4. **M4 (T19–T20)**: servizio `hattrick.set_match_orders` (POST `matchorders.xml`,
-   richiede permesso scrittura sull'app CHPP), `hattrick.refresh`,
-   `services.yaml` + `icons.json` + traduzioni servizi.
-5. **M5–M8**: dashboard/esempi, test suite completa, release HACS v1.0.0,
-   certificazione CHPP — vedi `docs/09-piano-di-lavoro.md`.
+1. **T19 (M4)**: servizio `hattrick.set_match_orders` (POST `matchorders.xml`,
+   richiede permesso scrittura sull'app CHPP): schema voluptuous + selettori in
+   `services.yaml`, client `async_post_file` in `api.py`, refresh post-invio,
+   risposta con esito; test con mock POST (payload XML corretto).
+2. **T20 (M4)**: servizio `hattrick.refresh` + icone servizi (`icons.json`) +
+   traduzioni servizi in strings/it/en; verifica hassfest su `services.yaml`.
+3. **M5 (T21–T22)**: dashboard Lovelace di esempio + automazioni + README utente.
+4. **M6–M8**: test suite completa (coverage > 80%), diagnostics redatta,
+   release v1.0.0, certificazione CHPP (testo pronto in `docs/11`, ma
+   **ricontrollare la policy CHPP sull'AI**: a maggio 2026 Hattrick ha rifiutato
+   un'app generata da AI) — vedi `docs/09-piano-di-lavoro.md`.
 
 ## 6. Attenzioni e note tecniche
 
@@ -168,6 +178,6 @@ Baseline attesa: **47 passed**, coverage ~93%.
 
 ## 8. Come riprendere
 
-Chiedere: *"procedi con T16"* (o l'ultimo task in sospeso). Ricostruire il venv
-(sezione 2), lanciare `pytest -q` per confermare la baseline 47 passed, poi
+Chiedere: *"procedi con T19"* (o l'ultimo task in sospeso). Ricostruire il venv
+(sezione 2), lanciare `pytest -q` per confermare la baseline 59 passed, poi
 lavorare al task e committare.

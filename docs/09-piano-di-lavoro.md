@@ -6,9 +6,9 @@ Piano operativo per lo sviluppo dell'integrazione, derivato dalla roadmap in
 
 ## Stato di avanzamento (aggiornato al 2026-11-14)
 
-**M2 completata e rilasciata**: tag `v0.2.0`, pushato su `origin/main`.
-Test: 47 passed. Coverage totale 93% (models 98%, sensor 98%, coordinator 96%,
-entity 100%, config_flow 85%, `__init__` 96%, api 74%).
+**M3 completata e rilasciata**: tag `v0.3.0`, pushato su `origin/main`.
+Test: 59 passed. Coverage totale 94% (models 98%, sensor 98%, coordinator 91%,
+entity 100%, config_flow 86%, `__init__` 97%, api 88%, services 83%).
 
 | Task | Stato | Commit |
 |------|-------|--------|
@@ -27,8 +27,11 @@ entity 100%, config_flow 85%, `__init__` 96%, api 74%).
 | T13 | fatto | `27ba3a6` (sensor classifica/partite/economia) |
 | T14 | fatto | `c737a18` (sensor allenamento/stadio/mondo/allenatore) |
 | T15 | fatto | `15cec8c` (opzioni + modalità matchday) |
+| T16 | fatto | `783da55` (servizi get_match_details/get_player + services.yaml) |
+| T17 | fatto | `15cec8c` (matchday già in T15: polling 5 min in finestra HTT) |
+| T18 | fatto | `6c228e5` (sensor diagnostici dettaglio/tattica ultima partita) |
 
-**Prossimo task: T16 (inizio M3).** Per riprendere il lavoro in una nuova
+**Prossimo task: T19 (inizio M4).** Per riprendere il lavoro in una nuova
 sessione vedi `docs/10-handoff-nuova-sessione.md`.
 
 ## Convenzioni di lavoro
