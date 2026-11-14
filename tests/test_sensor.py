@@ -97,3 +97,46 @@ async def test_device_info_groups_entities(hass: HomeAssistant):
     entity_id = entity_registry.async_get_entity_id("sensor", DOMAIN, "7654321_morale")
     entry = entity_registry.async_get(entity_id)
     assert entry.device_id == device.id
+
+
+def _state(hass: HomeAssistant, key: str):
+    registry = er.async_get(hass)
+    entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"7654321_{key}")
+    assert entity_id is not None, f"entità mancante: {key}"
+    return hass.states.get(entity_id)
+
+
+async def test_sensor_rosa(hass: HomeAssistant):
+    await _setup_entry(hass)
+    assert _state(hass, "giocatori").state == "3"
+    assert _state(hass, "tsi_totale").state == str(80000 + 60000 + 45000)
+    assert _state(hass, "infortunati").state == "1"
+    assert _state(hass, "squalificati").state == "1"
+    assert _state(hass, "forma_squadra").state == str(round((6 + 5 + 7) / 3, 2))
+
+
+async def test_sensor_rosa_attributi(hass: HomeAssistant):
+    await _setup_entry(hass)
+    giocatori = _state(hass, "giocatori").attributes["giocatori"]
+    assert len(giocatori) == 3
+    assert giocatori[0]["nome"] == "Mario Rossi"
+    assert giocatori[0]["ruolo"] == "portiere"
+    assert giocatori[1]["infortunio_settimane"] == 2
+    assert giocatori[2]["squalificato"] is True
+    infortunati = _state(hass, "infortunati").attributes["infortunati"]
+    assert infortunati == [{"id": 1002, "nome": "Luca Il Muro Bianchi", "settimane": 2}]
+    squalificati = _state(hass, "squalificati").attributes["squalificati"]
+    assert squalificati[0]["cartellini"] == 3
+    forma = _state(hass, "forma_squadra").attributes["forma_per_reparto"]
+    assert forma["POR"] == 6.0
+    assert forma["ATT"] == 7.0
+
+
+async def test_sensor_club(hass: HomeAssistant):
+    await _setup_entry(hass)
+    assert _state(hass, "fanclub").state == "1500"
+    assert _state(hass, "settore_giovanile").state == "5"
+    staff = _state(hass, "staff")
+    assert staff.state == "3"
+    assert staff.attributes["medico"]["livello"] == 4
+    assert staff.attributes["psicologo"]["nome"] == "Sig.ra Calma"

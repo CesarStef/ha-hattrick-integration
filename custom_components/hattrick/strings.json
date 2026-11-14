@@ -67,7 +67,26 @@
       "team_name": { "name": "Nome squadra" },
       "morale": { "name": "Morale" },
       "fiducia_tifosi": { "name": "Fiducia tifosi" },
-      "cassa": { "name": "Cassa" }
+      "cassa": { "name": "Cassa" },
+      "giocatori": { "name": "Giocatori" },
+      "tsi_totale": { "name": "TSI totale" },
+      "infortunati": { "name": "Infortunati" },
+      "squalificati": { "name": "Squalificati" },
+      "forma_squadra": { "name": "Forma squadra" },
+      "fanclub": { "name": "Fan club" },
+      "settore_giovanile": { "name": "Settore giovanile" },
+      "staff": { "name": "Staff" },
+      "posizione": { "name": "Posizione in classifica" },
+      "prossima_partita": { "name": "Prossima partita" },
+      "ultima_partita": { "name": "Ultima partita" },
+      "partite_programmate": { "name": "Partite programmate" },
+      "entrate_previste": { "name": "Entrate previste" },
+      "stipendi": { "name": "Stipendi" },
+      "allenatore": { "name": "Allenatore" },
+      "allenamento": { "name": "Allenamento" },
+      "progresso_allenamento": { "name": "Progresso allenamento" },
+      "stadio": { "name": "Stadio" },
+      "server_time": { "name": "Orario server HT" }
     }
   }
 }
