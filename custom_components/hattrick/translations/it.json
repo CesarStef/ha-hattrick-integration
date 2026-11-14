@@ -3,10 +3,62 @@
     "step": {
       "user": {
         "title": "Hattrick",
-        "description": "Configurazione in fase di sviluppo (task T7).",
+        "description": "Scegli come collegare il tuo account Hattrick.",
         "data": {
-          "placeholder": "Valore temporaneo"
+          "mode": "Modalità di autenticazione"
         }
+      },
+      "manual": {
+        "title": "Credenziali CHPP",
+        "description": "Inserisci le credenziali ottenute registrando un'app su chpp.hattrick.org e autorizzandola sul tuo account.",
+        "data": {
+          "consumer_key": "Consumer Key",
+          "consumer_secret": "Consumer Secret",
+          "access_token": "Access Token",
+          "access_token_secret": "Access Token Secret"
+        }
+      },
+      "auth": {
+        "title": "Autorizza su Hattrick",
+        "description": "1. Apri {authorize_url} nel browser e fai login su Hattrick.\n2. Clicca \"Allow\".\n3. Copia il codice verifier mostrato e incollalo qui sotto.",
+        "data": {
+          "verifier": "Verifier"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Ri-autorizza Hattrick",
+        "description": "Il token di accesso è stato revocato. Apri {authorize_url} nel browser, clicca \"Allow\" e incolla il nuovo verifier.",
+        "data": {
+          "verifier": "Verifier"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi a CHPP. Riprova più tardi.",
+      "invalid_auth": "Credenziali CHPP non valide.",
+      "invalid_verifier": "Verifier non valido o scaduto."
+    },
+    "abort": {
+      "already_configured": "Questo account Hattrick è già configurato.",
+      "reauth_successful": "Nuova autenticazione riuscita."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni Hattrick",
+        "data": {
+          "scan_interval": "Intervallo di aggiornamento (minuti)",
+          "enabled_files": "File CHPP da scaricare"
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_mode": {
+      "options": {
+        "auto": "Automatica (consigliata)",
+        "manual": "Manuale (credenziali CHPP)"
       }
     }
   }

@@ -3,10 +3,62 @@
     "step": {
       "user": {
         "title": "Hattrick",
-        "description": "Configuration under development (task T7).",
+        "description": "Choose how to connect your Hattrick account.",
         "data": {
-          "placeholder": "Temporary value"
+          "mode": "Authentication mode"
         }
+      },
+      "manual": {
+        "title": "CHPP credentials",
+        "description": "Enter the credentials obtained by registering an app on chpp.hattrick.org and authorizing it on your account.",
+        "data": {
+          "consumer_key": "Consumer Key",
+          "consumer_secret": "Consumer Secret",
+          "access_token": "Access Token",
+          "access_token_secret": "Access Token Secret"
+        }
+      },
+      "auth": {
+        "title": "Authorize on Hattrick",
+        "description": "1. Open {authorize_url} in your browser and log in to Hattrick.\n2. Click \"Allow\".\n3. Copy the verifier code shown and paste it below.",
+        "data": {
+          "verifier": "Verifier"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authorize Hattrick",
+        "description": "The access token has been revoked. Open {authorize_url} in your browser, click \"Allow\" and paste the new verifier.",
+        "data": {
+          "verifier": "Verifier"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to CHPP. Please try again later.",
+      "invalid_auth": "Invalid CHPP credentials.",
+      "invalid_verifier": "Invalid or expired verifier."
+    },
+    "abort": {
+      "already_configured": "This Hattrick account is already configured.",
+      "reauth_successful": "Re-authentication successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Hattrick options",
+        "data": {
+          "scan_interval": "Update interval (minutes)",
+          "enabled_files": "CHPP files to download"
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_mode": {
+      "options": {
+        "auto": "Automatic (recommended)",
+        "manual": "Manual (CHPP credentials)"
       }
     }
   }
