@@ -9,6 +9,7 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 from zoneinfo import ZoneInfo
 
 HTT_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -57,6 +58,14 @@ STAFF_TYPES = {
     3: "psicologo",
     4: "portavoce",
     5: "preparatore atletico",
+}
+TACTIC_TYPES = {
+    0: "normale",
+    1: "pressing",
+    2: "contropiede",
+    3: "palla lunga",
+    4: "creativa",
+    5: "relax",
 }
 
 
@@ -231,6 +240,36 @@ class Player:
     def suspended(self) -> bool:
         """True se il giocatore è squalificato (3+ cartellini)."""
         return self.cards >= 3
+
+    def to_dict(self) -> dict[str, Any]:
+        """Rappresentazione JSON-serializzabile per la risposta del servizio."""
+        return {
+            "player_id": self.player_id,
+            "nome": self.full_name,
+            "numero": self.number,
+            "ruolo": self.role,
+            "eta": self.age,
+            "giorni_eta": self.age_days,
+            "tsi": self.tsi,
+            "forma": self.form,
+            "esperienza": self.experience,
+            "leadership": self.leadership,
+            "stipendio": self.salary,
+            "specialita": self.specialty_label,
+            "cartellini": self.cards,
+            "infortunio_settimane": self.injury_weeks,
+            "in_lista_trasferimenti": self.transfer_listed,
+            "skill": {
+                "portiere": self.keeper,
+                "difensore": self.defender,
+                "centrocampista": self.playmaker,
+                "passaggi": self.passing,
+                "ala": self.winger,
+                "attaccante": self.scoring,
+                "calci_piazzati": self.set_pieces,
+                "resistenza": self.stamina,
+            },
+        }
 
     @classmethod
     def from_xml(cls, elem: ET.Element) -> Player:
@@ -722,6 +761,137 @@ class World:
         )
 
 
+def _ratings(elem: ET.Element | None, prefix: str) -> dict[str, int]:
+    """Dizionario dei rating di reparto (POR/DIF/CC/ATT) da un nodo ratings."""
+    if elem is None:
+        return {}
+    return {
+        "POR": _find_int(elem, f"{prefix}Goalkeeper"),
+        "DIF": _find_int(elem, f"{prefix}Defense"),
+        "CC": _find_int(elem, f"{prefix}Midfield"),
+        "ATT": _find_int(elem, f"{prefix}Attack"),
+    }
+
+
+@dataclass
+class MatchDetails:
+    """Dettaglio di una partita da matchdetails.xml (on-demand, richiede matchID)."""
+
+    match_id: int
+    match_date: datetime
+    home_id: int
+    home_name: str
+    home_goals: int
+    away_id: int
+    away_name: str
+    away_goals: int
+    arena_name: str
+    weather: str
+    sold_total: int
+    referee_name: str
+    possession_home: int
+    shots_home: int
+    shots_away: int
+    home_ratings: dict[str, int]
+    away_ratings: dict[str, int]
+
+    def to_dict(self) -> dict[str, Any]:
+        """Rappresentazione JSON-serializzabile per la risposta del servizio."""
+        return {
+            "match_id": self.match_id,
+            "match_date": self.match_date.isoformat(),
+            "home_team": {"id": self.home_id, "name": self.home_name, "goals": self.home_goals},
+            "away_team": {"id": self.away_id, "name": self.away_name, "goals": self.away_goals},
+            "arena": self.arena_name,
+            "weather": self.weather,
+            "sold_total": self.sold_total,
+            "referee": self.referee_name,
+            "possession_home": self.possession_home,
+            "shots_home": self.shots_home,
+            "shots_away": self.shots_away,
+            "home_ratings": self.home_ratings,
+            "away_ratings": self.away_ratings,
+        }
+
+    @classmethod
+    def from_xml(cls, root: ET.Element) -> MatchDetails:
+        home = root.find("HomeTeam")
+        away = root.find("AwayTeam")
+        arena = root.find("Arena")
+        referee = root.find("MatchReferee")
+        stats = root.find("MatchStatistics")
+        return cls(
+            match_id=_find_int(root, "MatchID"),
+            match_date=parse_htt_datetime(_find_text(root, "MatchDate")),
+            home_id=_find_int(home, "HomeTeamID"),
+            home_name=_find_text(home, "HomeTeamName"),
+            home_goals=_find_int(home, "HomeGoals"),
+            away_id=_find_int(away, "AwayTeamID"),
+            away_name=_find_text(away, "AwayTeamName"),
+            away_goals=_find_int(away, "AwayGoals"),
+            arena_name=_find_text(arena, "ArenaName"),
+            weather=_find_text(arena, "Weather"),
+            sold_total=_find_int(arena, "SoldTotal"),
+            referee_name=_find_text(referee, "RefereeName"),
+            possession_home=_find_int(stats, "PossessionHome"),
+            shots_home=_find_int(stats, "ShotsHome"),
+            shots_away=_find_int(stats, "ShotsAway"),
+            home_ratings=_ratings(
+                stats.find("HomeRatings") if stats is not None else None, "Rating"
+            ),
+            away_ratings=_ratings(
+                stats.find("AwayRatings") if stats is not None else None, "Rating"
+            ),
+        )
+
+
+@dataclass
+class MatchLineup:
+    """Formazione e tattica di una partita da matchlineup.xml (on-demand, matchID)."""
+
+    match_id: int
+    match_date: datetime
+    team_id: int
+    formation: str
+    tactic_type: int
+    tactic_skill: int
+    ratings: dict[str, int]
+
+    @property
+    def tactic_label(self) -> str:
+        """Etichetta della tattica usata."""
+        return TACTIC_TYPES.get(self.tactic_type, "sconosciuta")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Rappresentazione JSON-serializzabile."""
+        return {
+            "match_id": self.match_id,
+            "match_date": self.match_date.isoformat(),
+            "team_id": self.team_id,
+            "formation": self.formation,
+            "tactic": self.tactic_label,
+            "tactic_skill": self.tactic_skill,
+            "ratings": self.ratings,
+        }
+
+    @classmethod
+    def from_xml(cls, root: ET.Element, team_id: int) -> MatchLineup:
+        """Legge il lato (casa/trasferta) della squadra con `team_id`."""
+        home = root.find("HomeTeam")
+        away = root.find("AwayTeam")
+        side = home if _find_int(home, "HomeTeamID") == team_id else away
+        ratings = side.find("Ratings") if side is not None else None
+        return cls(
+            match_id=_find_int(root, "MatchID"),
+            match_date=parse_htt_datetime(_find_text(root, "MatchDate")),
+            team_id=team_id,
+            formation=_find_text(side, "TeamFormation"),
+            tactic_type=_find_int(side, "TacticType"),
+            tactic_skill=_find_int(side, "TacticSkill"),
+            ratings=_ratings(ratings, "Rating"),
+        )
+
+
 @dataclass
 class HattrickData:
     """Contenitore dei dati aggiornati dal coordinator.
@@ -741,3 +911,5 @@ class HattrickData:
     matches: Matches | None = None
     arena: Arena | None = None
     world: World | None = None
+    match_details: MatchDetails | None = None
+    match_lineup: MatchLineup | None = None

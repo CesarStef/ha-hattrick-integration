@@ -38,6 +38,7 @@ from .const import (
     DOMAIN,
     MAX_SCAN_INTERVAL,
     MIN_SCAN_INTERVAL,
+    SELECTABLE_FILES,
 )
 from .models import Team
 
@@ -333,7 +334,7 @@ class HattrickOptionsFlow(OptionsFlow):
                     vol.Required(CONF_ENABLED_FILES, default=current_files): (
                         selector.SelectSelector(
                             selector.SelectSelectorConfig(
-                                options=list(DEFAULT_ENABLED_FILES),
+                                options=list(SELECTABLE_FILES),
                                 multiple=True,
                                 mode=selector.SelectSelectorMode.LIST,
                             )

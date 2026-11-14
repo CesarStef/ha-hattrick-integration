@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>matchdetails</FileName>
+  <Version>3.5</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <MatchID>9001</MatchID>
+  <MatchDate>2026-11-07 19:30:00</MatchDate>
+  <HomeTeam>
+    <HomeTeamID>7654321</HomeTeamID>
+    <HomeTeamName>Squadra di Test</HomeTeamName>
+    <HomeGoals>3</HomeGoals>
+  </HomeTeam>
+  <AwayTeam>
+    <AwayTeamID>8000001</AwayTeamID>
+    <AwayTeamName>Avversari FC</AwayTeamName>
+    <AwayGoals>1</AwayGoals>
+  </AwayTeam>
+  <Arena>
+    <ArenaID>7654322</ArenaID>
+    <ArenaName>Stadio di Test</ArenaName>
+    <WeatherID>1</WeatherID>
+    <Weather>Sunny</Weather>
+    <SoldTotal>48000</SoldTotal>
+  </Arena>
+  <MatchReferee>
+    <RefereeID>555</RefereeID>
+    <RefereeName>Arbitro Test</RefereeName>
+  </MatchReferee>
+  <MatchStatistics>
+    <PossessionHome>55</PossessionHome>
+    <PossessionAway>45</PossessionAway>
+    <ShotsHome>12</ShotsHome>
+    <ShotsAway>6</ShotsAway>
+    <HomeRatings>
+      <RatingGoalkeeper>8</RatingGoalkeeper>
+      <RatingDefense>7</RatingDefense>
+      <RatingMidfield>9</RatingMidfield>
+      <RatingAttack>8</RatingAttack>
+    </HomeRatings>
+    <AwayRatings>
+      <RatingGoalkeeper>6</RatingGoalkeeper>
+      <RatingDefense>6</RatingDefense>
+      <RatingMidfield>7</RatingMidfield>
+      <RatingAttack>5</RatingAttack>
+    </AwayRatings>
+  </MatchStatistics>
+</HattrickData>

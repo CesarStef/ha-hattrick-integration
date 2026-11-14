@@ -18,6 +18,7 @@ from .const import (
     DOMAIN,
     MATCHDAY_INTERVAL,
     MATCHDAY_WINDOW,
+    ON_DEMAND_FILES,
 )
 from .models import (
     HTT_TIMEZONE,
@@ -26,7 +27,9 @@ from .models import (
     Economy,
     HattrickData,
     LeagueDetails,
+    MatchDetails,
     Matches,
+    MatchLineup,
     Players,
     Team,
     TeamMood,
@@ -81,7 +84,11 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
 
     async def _async_update_data(self) -> HattrickData:
         """Scarica i file abilitati in parallelo e costruisce il modello dati."""
-        files = list(BASE_FILES) + [f for f in self.enabled_files if f not in BASE_FILES]
+        files = [
+            f
+            for f in (list(BASE_FILES) + [f for f in self.enabled_files if f not in BASE_FILES])
+            if f not in ON_DEMAND_FILES
+        ]
         try:
             roots = await asyncio.gather(
                 *(self.client.async_get_file(self.hass, file) for file in files)
@@ -112,8 +119,32 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
             arena=optional.get("arenadetails"),  # type: ignore[arg-type]
             world=optional.get("worlddetails"),  # type: ignore[arg-type]
         )
+        await self._async_fetch_on_demand(data)
         self._apply_matchday_interval(data)
         return data
+
+    async def _async_fetch_on_demand(self, data: HattrickData) -> None:
+        """Scarica matchdetails/matchlineup dell'ultima partita, se abilitati."""
+        last = data.matches.last_match if data.matches else None
+        if last is None:
+            return
+        try:
+            if "matchdetails" in self.enabled_files:
+                root = await self.client.async_get_file(
+                    self.hass, "matchdetails", matchID=last.match_id
+                )
+                data.match_details = MatchDetails.from_xml(root)
+            if "matchlineup" in self.enabled_files:
+                root = await self.client.async_get_file(
+                    self.hass, "matchlineup", matchID=last.match_id
+                )
+                data.match_lineup = MatchLineup.from_xml(root, data.team.team_id)
+        except HattrickAuthError as err:
+            raise ConfigEntryAuthFailed(
+                translation_domain=DOMAIN, translation_key="auth_error"
+            ) from err
+        except HattrickApiError as err:
+            raise UpdateFailed(str(err)) from err
 
     def _apply_matchday_interval(self, data: HattrickData) -> None:
         """Riduce l'intervallo a 5 min dentro la finestra di partita (se matchday attivo)."""

@@ -1,0 +1,26 @@
+get_match_details:
+  fields:
+    match_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: hattrick
+get_player:
+  fields:
+    player_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: hattrick

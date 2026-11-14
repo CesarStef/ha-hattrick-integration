@@ -143,5 +143,35 @@
         "name": "HT server time"
       }
     }
+  },
+  "services": {
+    "get_match_details": {
+      "name": "Match details",
+      "description": "Fetches match details from CHPP (goals, possession, shots, ratings, weather, referee) and returns them as the service response.",
+      "fields": {
+        "match_id": {
+          "name": "Match ID",
+          "description": "MatchID of the match (e.g. from the match_id attribute of the next match sensor)."
+        },
+        "config_entry": {
+          "name": "Team (config entry)",
+          "description": "Optional: which configured team to use, if you have more than one."
+        }
+      }
+    },
+    "get_player": {
+      "name": "Player details",
+      "description": "Fetches a player's data from CHPP (skills, form, TSI, salary, injuries) and returns it as the service response.",
+      "fields": {
+        "player_id": {
+          "name": "Player ID",
+          "description": "PlayerID of the player (e.g. from the giocatori attribute of the squad sensor)."
+        },
+        "config_entry": {
+          "name": "Team (config entry)",
+          "description": "Optional: which configured team to use, if you have more than one."
+        }
+      }
+    }
   }
 }

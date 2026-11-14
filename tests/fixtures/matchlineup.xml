@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>matchlineup</FileName>
+  <Version>2.5</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <MatchID>9001</MatchID>
+  <MatchDate>2026-11-07 19:30:00</MatchDate>
+  <HomeTeam>
+    <HomeTeamID>7654321</HomeTeamID>
+    <HomeTeamName>Squadra di Test</HomeTeamName>
+    <TeamFormation>433</TeamFormation>
+    <TacticType>1</TacticType>
+    <TacticSkill>5</TacticSkill>
+    <Ratings>
+      <RatingGoalkeeper>8</RatingGoalkeeper>
+      <RatingDefense>7</RatingDefense>
+      <RatingMidfield>9</RatingMidfield>
+      <RatingAttack>8</RatingAttack>
+    </Ratings>
+  </HomeTeam>
+  <AwayTeam>
+    <AwayTeamID>8000001</AwayTeamID>
+    <AwayTeamName>Avversari FC</AwayTeamName>
+    <TeamFormation>442</TeamFormation>
+    <TacticType>0</TacticType>
+    <TacticSkill>4</TacticSkill>
+    <Ratings>
+      <RatingGoalkeeper>6</RatingGoalkeeper>
+      <RatingDefense>6</RatingDefense>
+      <RatingMidfield>7</RatingMidfield>
+      <RatingAttack>5</RatingAttack>
+    </Ratings>
+  </AwayTeam>
+</HattrickData>

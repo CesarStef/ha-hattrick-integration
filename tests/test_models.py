@@ -11,7 +11,9 @@ from custom_components.hattrick.models import (
     Club,
     Economy,
     LeagueDetails,
+    MatchDetails,
     Matches,
+    MatchLineup,
     Players,
     Team,
     TeamMood,
@@ -173,3 +175,48 @@ def test_worlddetails_from_xml():
     assert league.training_date == datetime(2026, 11, 15, 3, 30, 0)
     assert league.economy_date == datetime(2026, 11, 15, 3, 45, 0)
     assert world.league(99999) is None
+
+
+def test_matchdetails_from_xml():
+    details = MatchDetails.from_xml(_root("matchdetails.xml"))
+    assert details.match_id == 9001
+    assert details.match_date == datetime(2026, 11, 7, 19, 30, 0)
+    assert details.home_id == 7654321
+    assert details.home_name == "Squadra di Test"
+    assert details.home_goals == 3
+    assert details.away_name == "Avversari FC"
+    assert details.away_goals == 1
+    assert details.arena_name == "Stadio di Test"
+    assert details.weather == "Sunny"
+    assert details.sold_total == 48000
+    assert details.referee_name == "Arbitro Test"
+    assert details.possession_home == 55
+    assert details.shots_home == 12
+    assert details.shots_away == 6
+    assert details.home_ratings == {"POR": 8, "DIF": 7, "CC": 9, "ATT": 8}
+    assert details.away_ratings["ATT"] == 5
+    as_dict = details.to_dict()
+    assert as_dict["home_team"]["goals"] == 3
+    assert as_dict["home_ratings"]["CC"] == 9
+
+
+def test_matchlineup_from_xml_home_team():
+    lineup = MatchLineup.from_xml(_root("matchlineup.xml"), team_id=7654321)
+    assert lineup.match_id == 9001
+    assert lineup.team_id == 7654321
+    assert lineup.formation == "433"
+    assert lineup.tactic_type == 1
+    assert lineup.tactic_label == "pressing"
+    assert lineup.tactic_skill == 5
+    assert lineup.ratings == {"POR": 8, "DIF": 7, "CC": 9, "ATT": 8}
+    as_dict = lineup.to_dict()
+    assert as_dict["tactic"] == "pressing"
+    assert as_dict["formation"] == "433"
+
+
+def test_matchlineup_from_xml_away_team():
+    lineup = MatchLineup.from_xml(_root("matchlineup.xml"), team_id=8000001)
+    assert lineup.formation == "442"
+    assert lineup.tactic_type == 0
+    assert lineup.tactic_label == "normale"
+    assert lineup.ratings["CC"] == 7

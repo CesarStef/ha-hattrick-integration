@@ -55,4 +55,11 @@ OPTIONAL_FILES: tuple[str, ...] = (
     "alliances",
 )
 
+# File on-demand abilitabili dalle opzioni: vengono scaricati con il matchID
+# dell'ultima partita giocata (non nel ciclo standard di default).
+ON_DEMAND_FILES: tuple[str, ...] = ("matchdetails", "matchlineup")
+
 DEFAULT_ENABLED_FILES: tuple[str, ...] = tuple(FILE_VERSIONS)
+
+# File selezionabili nelle opzioni: ciclo standard + on-demand.
+SELECTABLE_FILES: tuple[str, ...] = DEFAULT_ENABLED_FILES + ON_DEMAND_FILES

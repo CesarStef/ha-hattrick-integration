@@ -143,5 +143,35 @@
         "name": "Orario server HT"
       }
     }
+  },
+  "services": {
+    "get_match_details": {
+      "name": "Dettagli partita",
+      "description": "Scarica da CHPP i dettagli di una partita (gol, possesso, tiri, rating, meteo, arbitro) e li restituisce come risposta.",
+      "fields": {
+        "match_id": {
+          "name": "ID partita",
+          "description": "MatchID della partita (es. dall'attributo match_id del sensor prossima partita)."
+        },
+        "config_entry": {
+          "name": "Squadra (config entry)",
+          "description": "Opzionale: quale squadra configurata usare, se ne hai più di una."
+        }
+      }
+    },
+    "get_player": {
+      "name": "Dettagli giocatore",
+      "description": "Scarica da CHPP i dati di un giocatore (skill, forma, TSI, stipendio, infortuni) e li restituisce come risposta.",
+      "fields": {
+        "player_id": {
+          "name": "ID giocatore",
+          "description": "PlayerID del giocatore (es. dall'attributo giocatori del sensor rosa)."
+        },
+        "config_entry": {
+          "name": "Squadra (config entry)",
+          "description": "Opzionale: quale squadra configurata usare, se ne hai più di una."
+        }
+      }
+    }
   }
 }

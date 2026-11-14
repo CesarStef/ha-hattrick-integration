@@ -22,6 +22,7 @@ from .const import (
     DOMAIN,
 )
 from .coordinator import HattrickDataUpdateCoordinator
+from .services import async_setup_services, async_unload_services
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
@@ -53,6 +54,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HattrickConfigEntry) -> 
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
+    await async_setup_services(hass)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
@@ -63,6 +65,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: HattrickConfigEntry) ->
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
+        await async_unload_services(hass)
     return unload_ok
 
 
