@@ -6,9 +6,12 @@ configurazione avviene dalla UI (config flow), senza toccare YAML.
 ## 1. Aggiunta dell'integrazione
 
 1. L'utente installa l'integrazione via **HACS** (Repository → cerca "Hattrick" →
-   Download) oppure copiando `custom_components/hattrick/` in
-   `<config>/custom_components/`.
-2. Riavvia HA (solo la prima volta, dopo l'installazione via HACS).
+   Download) oppure, da **HA 2026.11** con il **Marketplace** integrato, aggiungendo il
+   repository custom (Marketplace → ⋮ → "Custom repositories" → URL
+   `https://github.com/CesarStef/ha-hattrick-integration`, categoria *Integration*),
+   poi Marketplace → Hattrick → installa. In alternativa copia
+   `custom_components/hattrick/` in `<config>/custom_components/`.
+2. Riavvia HA (solo la prima volta, dopo l'installazione).
 3. Va in **Impostazioni → Dispositivi e servizi → Aggiungi integrazione** e cerca
    **"Hattrick"**.
 

@@ -112,8 +112,16 @@ Baseline attesa: **47 passed**, coverage ~93%.
   (`identifiers={(DOMAIN, str(team_id))}`); i diagnostici hanno
   `entity_category=DIAGNOSTIC`. I timestamp (`prossima_partita`, `server_time`)
   usano `device_class=TIMESTAMP` e datetime aware HTT.
-- Nota HA 2025.1: `OptionsFlowWithConfigEntry` va istanziato con
-  `HattrickOptionsFlow(config_entry)` in `async_get_options_flow`.
+- Compatibilità HA: l'options flow usa `OptionsFlow` semplice con `config_entry`
+  auto-assegnato da HA (2024.11+): funziona su 2025.1 e su 2026.11 (dove
+  `OptionsFlowWithConfigEntry` è in phase-out e il setter rimosso dal 2025.12).
+  Il coordinator passa `config_entry=` esplicito al `DataUpdateCoordinator`
+  (raccomandato, ok sia su 2025.1 sia su 2026.x).
+  Attenzione futura: da HA **2026.12** la combinazione `add_update_listener` +
+  `async_update_reload_and_abort` (usata in reauth) solleverà un'eccezione:
+  a quel punto migrare a `OptionsFlowWithReload`.
+- Su HA 2026.11 il Marketplace è integrato (HACS si ferma a 2026.11): per testare
+  il repo basta aggiungerlo come "Custom repository" nel Marketplace.
 - Nota test: su Python 3.12 il venv risolve HA 2025.1.4 + PHACC 0.13.205
   (pin espliciti, vedi sezione 2); `requirements_test.txt` resta per py313.
 

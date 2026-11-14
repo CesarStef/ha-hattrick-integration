@@ -17,7 +17,7 @@ from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
     ConfigFlowResult,
-    OptionsFlowWithConfigEntry,
+    OptionsFlow,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
@@ -107,8 +107,12 @@ class HattrickConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> HattrickOptionsFlow:
-        """Restituisce il flusso delle opzioni."""
-        return HattrickOptionsFlow(config_entry)
+        """Restituisce il flusso delle opzioni.
+
+        `config_entry` è impostato automaticamente da HA (2024.11+): non va
+        passato al costruttore (su HA 2025.12+ il setter è rimosso).
+        """
+        return HattrickOptionsFlow()
 
     def __init__(self) -> None:
         """Stato temporaneo del flusso OAuth."""
@@ -271,8 +275,8 @@ class HattrickConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
 
-class HattrickOptionsFlow(OptionsFlowWithConfigEntry):
-    """Opzioni dell'integrazione: intervallo di polling e file abilitati."""
+class HattrickOptionsFlow(OptionsFlow):
+    """Opzioni dell'integrazione: intervallo di polling, file abilitati, matchday."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Form delle opzioni."""
