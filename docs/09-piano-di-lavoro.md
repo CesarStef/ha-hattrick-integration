@@ -6,9 +6,10 @@ Piano operativo per lo sviluppo dell'integrazione, derivato dalla roadmap in
 
 ## Stato di avanzamento (aggiornato al 2026-11-14)
 
-**M5 completata e rilasciata**: tag `v0.5.0`, pushato su `origin/main`.
-Test: 73 passed. Coverage totale 94% (models 98%, sensor 98%, coordinator 91%,
-entity 100%, config_flow 86%, `__init__` 97%, api 88%, services 93%).
+**M6 completata e rilasciata**: tag `v0.6.0`, pushato su `origin/main`.
+Test: 89 passed. Coverage totale 97% (coordinator 100%, services 100%,
+entity 100%, const 100%, config_flow 96%, diagnostics 94%, models 98%,
+sensor 98%, `__init__` 97%, api 88%, repairs 83%).
 
 | Task | Stato | Commit |
 |------|-------|--------|
@@ -34,8 +35,10 @@ entity 100%, config_flow 86%, `__init__` 97%, api 88%, services 93%).
 | T20 | fatto | `bd6478a` (servizio refresh + icons.json + servizi in services.yaml) |
 | T21 | fatto | `e399964` (examples/dashboard.yaml + automations.yaml + test) |
 | T22 | fatto | `bdb7561` (README utente: installazione, config, FAQ) |
+| T23 | fatto | `941480d` (test suite completa: 86 test, coverage 97%) |
+| T24 | fatto | `53e0433` (diagnostics redatta + repair token revocato) |
 
-**Prossimo task: T23 (inizio M6).** Per riprendere il lavoro in una nuova
+**Prossimo task: T25 (inizio M7).** Per riprendere il lavoro in una nuova
 sessione vedi `docs/10-handoff-nuova-sessione.md`.
 
 ## Convenzioni di lavoro

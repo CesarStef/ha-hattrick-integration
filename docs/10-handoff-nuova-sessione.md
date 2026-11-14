@@ -6,9 +6,10 @@ esattamente da dove ripartire. Aggiornarlo a ogni milestone.
 ## 1. Stato del repository
 
 - Branch `main`, remote `origin` = `https://github.com/CesarStef/ha-hattrick-integration.git`
-- Ultimo commit su main: `bdb7561`. Tag `v0.5.0` pushato.
-- **Milestone M5 completata**: 4 servizi, 23 sensor, esempi dashboard/automazioni
-  (`examples/`), README utente completo, 73 test verdi, coverage 94%.
+- Ultimo commit su main: `53e0433`. Tag `v0.6.0` pushato.
+- **Milestone M6 completata**: 4 servizi, 23 sensor, esempi + mock HTML
+  (`examples/mockups/`), diagnostics redatta, repair token revocato,
+  89 test verdi, coverage 97%.
 
 ```
 ha-hattrick-integration/
@@ -20,7 +21,7 @@ ha-hattrick-integration/
 │                                  #   pytest-homeassistant-custom-component, requests-oauthlib
 ├── .github/workflows/             # hassfest.yaml, hacs.yaml
 ├── custom_components/hattrick/
-│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.5.0
+│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.6.0
 │   ├── const.py                   # endpoint CHPP, CONF_*, FILE_VERSIONS, ON_DEMAND_FILES,
 │   │                              #   SELECTABLE_FILES, intervalli, matchday
 │   ├── api.py                     # HattrickCHPPClient (OAuth 1.0a) + HattrickApiError/AuthError
@@ -40,11 +41,13 @@ ha-hattrick-integration/
 │   │                              #   (supports_response ONLY) + refresh
 │   ├── services.yaml              # schema di tutti i servizi con selettori
 │   ├── icons.json                 # icone dei 4 servizi
+│   ├── diagnostics.py             # dump diagnostico con credenziali redatte (***)
+│   ├── repairs.py                 # fix flow: token revocato -> reauth
 │   ├── __init__.py                # setup/unload entry + registrazione/rimozione servizi
 │   ├── strings.json
 │   └── translations/{en,it}.json
 ├── docs/                          # 01-11 documentazione + piano + handoff + richiesta CHPP
-├── examples/                      # dashboard.yaml + automations.yaml di esempio (M5)
+├── examples/                      # dashboard.yaml + automations.yaml + mockups/index.html (M5)
 └── tests/
     ├── conftest.py                # sys.path + auto_enable_custom_integrations
     ├── fixtures/                  # 14 XML (aggiunti matchdetails.xml, matchlineup.xml)
@@ -55,12 +58,16 @@ ha-hattrick-integration/
     ├── test_sensor.py             # 11 test sensor/device (incl. diagnostici partita)
     ├── test_services.py           # 10 test servizi (on-demand, set_match_orders, refresh)
     ├── test_examples.py           # 4 test struttura esempi examples/
+    ├── test_diagnostics.py        # 3 test diagnostics redatta + repair token revocato
     └── test_api.py                # 12 test client CHPP (incl. POST matchorders)
 ```
 
 Commit recenti:
 
 ```
+53e0433 T24: diagnostics.py redatta + repair fixable token revocato
+941480d T23: test suite completa (86 test, coverage 97%)
+78ef989 Mock HTML dashboard (3 varianti) in examples/mockups/
 bdb7561 T22: README utente completo (installazione, config, FAQ, servizi)
 e399964 T21: esempi dashboard Lovelace e automazioni in examples/ + test
 bd6478a T20: servizio refresh + icons.json + servizi in services.yaml/traduzioni
@@ -98,11 +105,11 @@ gira su HA 2025.1+ (vedi `hacs.json`); il target di pyproject è py313 (HA 2026)
 
 ```bash
 /tmp/ht-venv/bin/ruff check . && /tmp/ht-venv/bin/ruff format .
-/tmp/ht-venv/bin/pytest -q                                        # 73 test
+/tmp/ht-venv/bin/pytest -q                                        # 89 test
 /tmp/ht-venv/bin/pytest -q --cov=custom_components/hattrick --cov-report=term-missing
 ```
 
-Baseline attesa: **73 passed**, coverage ~94%.
+Baseline attesa: **89 passed**, coverage ~97%.
 
 ## 4. Cosa è già implementato (mappa rápida)
 
@@ -157,12 +164,10 @@ Baseline attesa: **73 passed**, coverage ~94%.
 
 ## 5. Cosa resta da fare (prossimi passi, in ordine)
 
-1. **T23 (M6)**: test suite completa (coverage > 80% su `custom_components/hattrick`).
-2. **T24 (M6)**: `diagnostics.py` redatta (dump senza token/segreti) + repair per
-   token revocato + test automatico che il dump non contenga credenziali.
-3. **T25 (M7)**: release `v1.0.0` con release notes; verifica che Marketplace/HACS
-   installino la release in HA pulita.
-4. **T26 (M8)**: certificazione CHPP (testo pronto in `docs/11`, ma
+1. **T25 (M7)**: release `v1.0.0` con release notes; verifica che Marketplace/HACS
+   installino la release in HA pulita (su HA 2026.11 il Marketplace prende la
+   release se esiste, altrimenti main).
+2. **T26 (M8)**: certificazione CHPP (testo pronto in `docs/11`, ma
    **ricontrollare la policy CHPP sull'AI**: a maggio 2026 Hattrick ha rifiutato
    un'app generata da AI) — vedi `docs/09-piano-di-lavoro.md`.
 
@@ -191,6 +196,6 @@ Baseline attesa: **73 passed**, coverage ~94%.
 
 ## 8. Come riprendere
 
-Chiedere: *"procedi con T23"* (o l'ultimo task in sospeso). Ricostruire il venv
-(sezione 2), lanciare `pytest -q` per confermare la baseline 73 passed, poi
+Chiedere: *"procedi con T25"* (o l'ultimo task in sospeso). Ricostruire il venv
+(sezione 2), lanciare `pytest -q` per confermare la baseline 89 passed, poi
 lavorare al task e committare. Push solo a fine milestone (tag SemVer).
