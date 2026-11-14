@@ -175,3 +175,31 @@ async def test_sensor_economia_estesa(hass: HomeAssistant):
     assert _state(hass, "entrate_previste").state == "4800000"
     assert _state(hass, "entrate_previste").attributes["stipendi"] == 350000
     assert _state(hass, "stipendi").state == "350000"
+
+
+async def test_sensor_allenamento_e_stadio(hass: HomeAssistant):
+    await _setup_entry(hass)
+    allenatore = _state(hass, "allenatore")
+    assert allenatore.state == "Allenatore Test"
+    assert allenatore.attributes["livello"] == 5
+    allenamento = _state(hass, "allenamento")
+    assert allenamento.state == "gioco"
+    assert allenamento.attributes["intensita"] == 100
+    assert allenamento.attributes["parte_stamina"] == 10
+    progresso = _state(hass, "progresso_allenamento")
+    assert progresso.state == "gioco"
+    assert len(progresso.attributes["settimane"]) == 2
+    assert progresso.attributes["settimane"][0]["tipo"] == "difesa"
+    stadio = _state(hass, "stadio")
+    assert stadio.state == "50000"
+    assert stadio.attributes["settori"]["vip"] == 5000
+    assert stadio.attributes["nome"] == "Stadio di Test"
+
+
+async def test_sensor_server_time(hass: HomeAssistant):
+    await _setup_entry(hass)
+    server_time = _state(hass, "server_time")
+    # 10:30 HTT (CET, UTC+1 a novembre) -> 09:30 UTC nello stato HA
+    assert server_time.state == "2026-11-14T09:30:00+00:00"
+    assert server_time.attributes["stagione"] == 75
+    assert server_time.attributes["prossimo_training"] == "2026-11-15T03:30:00+01:00"

@@ -25,6 +25,23 @@ from .models import HattrickData, htt_to_aware
 StateValue = str | int | float | None
 
 
+def _world_attrs(data: HattrickData) -> dict[str, Any]:
+    """Attributi del sensor server_time: stagione e prossimi update HT della lega."""
+    if data.world is None:
+        return {}
+    attrs: dict[str, Any] = {
+        "stagione": data.world.season,
+        "paesi": data.world.countries,
+    }
+    league = data.world.league(data.team.league_id)
+    if league is not None:
+        attrs["prossimo_training"] = htt_to_aware(league.training_date).isoformat()
+        attrs["prossima_economy"] = htt_to_aware(league.economy_date).isoformat()
+        attrs["prossima_giornata"] = htt_to_aware(league.series_match_date).isoformat()
+        attrs["prossima_coppa"] = htt_to_aware(league.cup_match_date).isoformat()
+    return attrs
+
+
 @dataclass(frozen=True, kw_only=True)
 class HattrickSensorEntityDescription(SensorEntityDescription):
     """Descrizione di un sensor Hattrick con funzioni per stato e attributi."""
@@ -285,6 +302,77 @@ SENSORS: tuple[HattrickSensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: data.economy.wages,
+    ),
+    HattrickSensorEntityDescription(
+        key="allenatore",
+        translation_key="allenatore",
+        icon="mdi:whistle",
+        value_fn=lambda data: data.team.coach_name,
+        attrs_fn=lambda data: {"livello": data.team.coach_level},
+    ),
+    HattrickSensorEntityDescription(
+        key="allenamento",
+        translation_key="allenamento",
+        icon="mdi:dumbbell",
+        value_fn=lambda data: data.training.training_type_label if data.training else None,
+        attrs_fn=lambda data: (
+            {
+                "tipo": data.training.training_type,
+                "intensita": data.training.training_intensity,
+                "parte_stamina": data.training.stamina_part,
+            }
+            if data.training
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="progresso_allenamento",
+        translation_key="progresso_allenamento",
+        icon="mdi:chart-timeline-variant",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: (
+            data.training_summary.last_week.training_type_label
+            if data.training_summary and data.training_summary.last_week
+            else None
+        ),
+        attrs_fn=lambda data: (
+            {
+                "settimane": [
+                    {
+                        "stagione": w.season,
+                        "settimana": w.week,
+                        "tipo": w.training_type_label,
+                        "intensita": w.training_intensity,
+                    }
+                    for w in data.training_summary.weeks
+                ]
+            }
+            if data.training_summary
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="stadio",
+        translation_key="stadio",
+        icon="mdi:stadium",
+        value_fn=lambda data: data.arena.total_capacity if data.arena else None,
+        attrs_fn=lambda data: (
+            {
+                "nome": data.arena.arena_name,
+                "arena_id": data.arena.arena_id,
+                "settori": data.arena.sectors,
+            }
+            if data.arena
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="server_time",
+        translation_key="server_time",
+        icon="mdi:clock-outline",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=lambda data: htt_to_aware(data.world.server_time) if data.world else None,
+        attrs_fn=_world_attrs,
     ),
 )
 
