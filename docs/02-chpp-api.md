@@ -131,7 +131,7 @@ https://chpp.hattrick.org/chppxml.ashx?file=<nome>&version=<versione>&<parametri
 | `matchdetails` | 3.x | Dettaglio partita: gol, possesso, tiri, rating per reparto, eventi | Attributi sensor partita |
 | `matchlineup` | 2.x | Formación e tattica usata, rating squadra | Sensor tattica |
 | `arenadetails` | 1.x | Stadio: capacità, naming rights, livello settori | Sensor stadio |
-| `world` / `worldDetails` | 1.x | Dati globali: leghe, server time, prossima training/economy update | Sensor "prossimo update HT" |
+| `worlddetails` | 1.2 | Dati globali: leghe, server time, prossima training/economy update | Sensor "prossimo update HT" |
 | `cup`, `cups` | 1.x | Coppe a cui si partecipa | Sensor coppe |
 | `alliances` | 1.x | Alleanze | Diagnostica |
 | `matchorders` | 1.x | **Scrittura**: invio ordini di partita (formazione, tattica, sostituzioni, capitano, rigoristi) | Servizio `set_match_orders` |

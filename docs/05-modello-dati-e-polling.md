@@ -144,7 +144,7 @@ Principi (derivati dalle regole CHPP, vedi `docs/02` §6):
 | leaguedetails | sì | classifica (aggiornata dopo le partite) |
 | matches | sì | prossime/ultime partite |
 | arenadetails | sì (o on-change) | cambia raramente |
-| world | sì | server time e prossimi update HT |
+| worlddetails | sì | server time e prossimi update HT |
 | matchdetails / matchlineup | on-demand | solo per match_id specifico |
 | matchesarchive | no (opzionale) | pesante, solo su richiesta |
 | cup, alliances | opzionale | diagnostica |

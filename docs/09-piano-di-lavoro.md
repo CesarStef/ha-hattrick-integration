@@ -6,10 +6,9 @@ Piano operativo per lo sviluppo dell'integrazione, derivato dalla roadmap in
 
 ## Stato di avanzamento (aggiornato al 2026-11-14)
 
-**M1 completata e rilasciata**: tag `v0.1.0`, pushato su `origin/main`
-(ultimo commit `38f17e4`). Test: 26 passed. Coverage totale 90%
-(coordinator 100%, config_flow 85%, sensor/entity 100%, models 97%,
-`__init__` 96%, api 74%).
+**M2 completata e rilasciata**: tag `v0.2.0`, pushato su `origin/main`.
+Test: 47 passed. Coverage totale 93% (models 98%, sensor 98%, coordinator 96%,
+entity 100%, config_flow 85%, `__init__` 96%, api 74%).
 
 | Task | Stato | Commit |
 |------|-------|--------|
@@ -23,8 +22,13 @@ Piano operativo per lo sviluppo dell'integrazione, derivato dalla roadmap in
 | T8 | fatto | `67a1933` |
 | T9 | fatto | `38f17e4` (grep: nessun testo UI hardcoded) |
 | T10 | fatto | `38f17e4` (coverage, tag `v0.1.0`) |
+| T11 | fatto | `e1d70ed` (parsing esteso 8 file + coordinator multi-file) |
+| T12 | fatto | `67c98ca` (sensor rosa + club) |
+| T13 | fatto | `27ba3a6` (sensor classifica/partite/economia) |
+| T14 | fatto | `c737a18` (sensor allenamento/stadio/mondo/allenatore) |
+| T15 | fatto | `15cec8c` (opzioni + modalità matchday) |
 
-**Prossimo task: T11 (inizio M2).** Per riprendere il lavoro in una nuova
+**Prossimo task: T16 (inizio M3).** Per riprendere il lavoro in una nuova
 sessione vedi `docs/10-handoff-nuova-sessione.md`.
 
 ## Convenzioni di lavoro
