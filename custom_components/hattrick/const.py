@@ -1,8 +1,16 @@
 """Costanti dell'integrazione Hattrick."""
 
+import json
 from datetime import timedelta
+from pathlib import Path
 
 DOMAIN = "hattrick"
+
+# Versione letta dal manifest (usata nello User-Agent, richiesto dal CHPP Manual:
+# "Applications must, in the http-request user-agent string, state which program
+# and version is connecting to Hattrick").
+_MANIFEST = json.loads((Path(__file__).parent / "manifest.json").read_text(encoding="utf-8"))
+USER_AGENT = f"hattrick-homeassistant/{_MANIFEST['version']} (Home Assistant custom integration)"
 
 # Endpoint CHPP (vedi docs/02-chpp-api.md)
 CHPP_BASE_URL = "https://chpp.hattrick.org"

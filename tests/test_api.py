@@ -103,6 +103,16 @@ def test_authorize_url():
     assert url == "https://chpp.hattrick.org/oauth/authorize.aspx?oauth_token=tok123"
 
 
+def test_user_agent_chpp_manual():
+    # CHPP Manual: lo user-agent deve indicare programma e versione
+    with mock.patch.object(api, "OAuth1Session") as session_cls:
+        session_cls.return_value.headers = {}
+        client = _client()
+    ua = client._session.headers["User-Agent"]
+    assert ua.startswith("hattrick-homeassistant/")
+    assert "Home Assistant" in ua
+
+
 def test_get_request_token_sync_wraps_value_error_as_auth_error():
     # requests-oauthlib solleva TokenRequestDenied (ValueError) se CHPP rifiuta
     with mock.patch.object(api, "OAuth1Session") as session_cls:

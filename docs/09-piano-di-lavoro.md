@@ -6,8 +6,8 @@ Piano operativo per lo sviluppo dell'integrazione, derivato dalla roadmap in
 
 ## Stato di avanzamento (aggiornato al 2026-11-14)
 
-**M6 completata e rilasciata**: tag `v0.6.0`, pushato su `origin/main`.
-Test: 89 passed. Coverage totale 97% (coordinator 100%, services 100%,
+**M7 completata e rilasciata**: tag `v1.0.0`, pushato su `origin/main`.
+Test: 90 passed. Coverage totale 97% (coordinator 100%, services 100%,
 entity 100%, const 100%, config_flow 96%, diagnostics 94%, models 98%,
 sensor 98%, `__init__` 97%, api 88%, repairs 83%).
 
@@ -37,9 +37,10 @@ sensor 98%, `__init__` 97%, api 88%, repairs 83%).
 | T22 | fatto | `bdb7561` (README utente: installazione, config, FAQ) |
 | T23 | fatto | `941480d` (test suite completa: 86 test, coverage 97%) |
 | T24 | fatto | `53e0433` (diagnostics redatta + repair token revocato) |
+| T25 | fatto | release `v1.0.0`: User-Agent CHPP, release notes, tag pushato |
 
-**Prossimo task: T25 (inizio M7).** Per riprendere il lavoro in una nuova
-sessione vedi `docs/10-handoff-nuova-sessione.md`.
+**Prossimo task: T26 (M8, certificazione CHPP).** Per riprendere il lavoro in una
+nuova sessione vedi `docs/10-handoff-nuova-sessione.md`.
 
 ## Convenzioni di lavoro
 

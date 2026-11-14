@@ -21,6 +21,7 @@ from .const import (
     OAUTH_ACCESS_TOKEN_URL,
     OAUTH_AUTHORIZE_URL,
     OAUTH_REQUEST_TOKEN_URL,
+    USER_AGENT,
 )
 
 if TYPE_CHECKING:
@@ -29,6 +30,13 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 REQUEST_TIMEOUT = 30
+
+
+def _oauth_session(consumer_key: str, client_secret: str, **kwargs: Any) -> OAuth1Session:
+    """Crea una OAuth1Session con lo User-Agent richiesto dal CHPP Manual."""
+    session = OAuth1Session(consumer_key, client_secret=client_secret, **kwargs)
+    session.headers["User-Agent"] = USER_AGENT
+    return session
 
 
 class HattrickApiError(Exception):
@@ -52,9 +60,9 @@ class HattrickCHPPClient:
         """Crea il client. Senza access token serve solo per il flusso OAuth."""
         self._consumer_key = consumer_key
         self._consumer_secret = consumer_secret
-        self._session = OAuth1Session(
+        self._session = _oauth_session(
             consumer_key,
-            client_secret=consumer_secret,
+            consumer_secret,
             resource_owner_key=access_token or None,
             resource_owner_secret=access_token_secret or None,
         )
@@ -65,9 +73,9 @@ class HattrickCHPPClient:
 
     def get_request_token_sync(self, callback_url: str = "oob") -> tuple[str, str]:
         """Passo 1: ottiene request token e request token secret."""
-        session = OAuth1Session(
+        session = _oauth_session(
             self._consumer_key,
-            client_secret=self._consumer_secret,
+            self._consumer_secret,
             callback_uri=callback_url,
         )
         try:
@@ -93,9 +101,9 @@ class HattrickCHPPClient:
         self, request_token: str, request_token_secret: str, verifier: str
     ) -> tuple[str, str]:
         """Passo 3: scambia request token + verifier con l'access token."""
-        session = OAuth1Session(
+        session = _oauth_session(
             self._consumer_key,
-            client_secret=self._consumer_secret,
+            self._consumer_secret,
             resource_owner_key=request_token,
             resource_owner_secret=request_token_secret,
             verifier=verifier,

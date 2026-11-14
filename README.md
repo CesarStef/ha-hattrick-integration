@@ -132,10 +132,12 @@ Con la modalità matchday il polling scende a 5 min solo dentro ±3h dalla parti
 
 ## Stato del progetto
 
-Milestone M1–M4 completate (release `v0.4.0`): config flow OAuth, coordinator multi-file,
-23 sensor, 4 servizi, 73 test verdi, coverage ~94%. Prossime milestone: esempi/README
-(M5, in corso), qualità e diagnostics (M6), release pubblica v1.0.0 (M7), certificazione
-CHPP (M8). Vedi [docs/09-piano-di-lavoro.md](docs/09-piano-di-lavoro.md).
+**Release `v1.0.0` pubblica** (milestone M1–M7 completate): config flow OAuth, coordinator
+multi-file, 23 sensor, 4 servizi, esempi e mock dashboard, diagnostics redatta, repair
+token revocato, 90 test verdi, coverage 97%. Prossima milestone: certificazione CHPP (M8,
+vedi [docs/11-chpp-certification-request.md](docs/11-chpp-certification-request.md)).
+Vedi [docs/09-piano-di-lavoro.md](docs/09-piano-di-lavoro.md). Release notes:
+[docs/12-release-notes-v1.0.0.md](docs/12-release-notes-v1.0.0.md).
 
 ## Disclaimer
 
@@ -157,3 +159,6 @@ In particolare:
 ## Licenza
 
 [Apache License 2.0](LICENSE) — Copyright 2026 Stefano Cattonar.
+
+*This application uses information from the online game service Hattrick.org.*
+(notice richiesta dal CHPP Manual per le app CHPP).
