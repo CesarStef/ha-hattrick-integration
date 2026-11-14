@@ -1,0 +1,103 @@
+# Automazioni di esempio per l'integrazione Hattrick.
+#
+# Come usarle:
+#   1. Copia il contenuto in un file `.yaml` dentro `packages/` (configurazione a
+#      pacchetti) oppure incollalo in Impostazioni -> Automazioni e script -> "+" ->
+#      "Crea automazione" -> menu ⋮ -> "Modifica in YAML".
+#   2. Sostituisci gli entity_id (sensor.*) e i servizi di notifica (notify.*) con i tuoi.
+#   3. L'automazione "ordini partita" usa il servizio hattrick.set_match_orders, che
+#      richiede il permesso di SCRITTURA sull'app CHPP: testala prima a mano da
+#      Strumenti sviluppatore -> Azioni.
+
+- alias: "Hattrick: notifica 30 minuti prima della partita"
+  description: "Avvisa 30 minuti prima del calcio d'inizio della prossima partita."
+  trigger:
+    - platform: template
+      value_template: >-
+        {{ states('sensor.prossima_partita') not in ('unknown', 'unavailable', 'none')
+           and now() >= (states('sensor.prossima_partita') | as_datetime) - timedelta(minutes=30)
+           and now() < (states('sensor.prossima_partita') | as_datetime) - timedelta(minutes=25) }}
+  condition: []
+  action:
+    - action: notify.mobile_app_stefano
+      data:
+        title: "Hattrick: si gioca!"
+        message: >-
+          Tra 30 minuti contro {{ state_attr('sensor.prossima_partita', 'avversario') }}
+          ({{ state_attr('sensor.prossima_partita', 'casa_trasferta') }},
+          {{ state_attr('sensor.prossima_partita', 'tipo') }}).
+  mode: single
+
+- alias: "Hattrick: allarme cassa bassa"
+  description: "Notifica se la cassa scende sotto 1.000.000."
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.cassa
+      below: 1000000
+  action:
+    - action: notify.mobile_app_stefano
+      data:
+        title: "Hattrick: cassa bassa"
+        message: "Cassa: {{ states('sensor.cassa') }} (prevista: {{ states('sensor.entrate_previste') }})"
+  mode: single
+
+- alias: "Hattrick: promemoria infortunati prima della partita"
+  description: "Un'ora prima della partita, ricorda quanti giocatori sono infortunati o squalificati."
+  trigger:
+    - platform: template
+      value_template: >-
+        {{ states('sensor.prossima_partita') not in ('unknown', 'unavailable', 'none')
+           and now() >= (states('sensor.prossima_partita') | as_datetime) - timedelta(hours=1)
+           and now() < (states('sensor.prossima_partita') | as_datetime) - timedelta(minutes=55) }}
+  action:
+    - action: notify.mobile_app_stefano
+      data:
+        title: "Hattrick: check pre-partita"
+        message: >-
+          Infortunati: {{ states('sensor.infortunati') }},
+          squalificati: {{ states('sensor.squalificati') }},
+          forma squadra: {{ states('sensor.forma_squadra') }}.
+  mode: single
+
+- alias: "Hattrick: dettagli ultima partita all'aggiornamento"
+  description: >-
+    Dopo ogni refresh, salva in input_text i rating dell'ultima partita
+    (utile per confrontarli nel tempo). Usa il servizio con risposta
+    hattrick.get_match_details.
+  trigger:
+    - platform: event
+      event_type: call_service
+      event_data:
+        domain: hattrick
+        service: refresh
+  action:
+    - action: hattrick.get_match_details
+      data:
+        match_id: "{{ state_attr('sensor.ultima_partita', 'match_id') }}"
+      response_variable: dettagli
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.ultimo_rating_casa
+      data:
+        value: "{{ dettagli.home_ratings }}"
+  mode: single
+
+- alias: "Hattrick: invio ordini partita (ESEMPIO, da testare a mano)"
+  description: >-
+    Esempio di invio ordini: 10 minuti prima del fischio d'inizio invia tattica
+    pressing al match_id della prossima partita. Richiede permesso di scrittura
+    sull'app CHPP. Valuta bene prima di automatizzarla.
+  trigger:
+    - platform: template
+      value_template: >-
+        {{ states('sensor.prossima_partita') not in ('unknown', 'unavailable', 'none')
+           and now() >= (states('sensor.prossima_partita') | as_datetime) - timedelta(minutes=10)
+           and now() < (states('sensor.prossima_partita') | as_datetime) - timedelta(minutes=5) }}
+  action:
+    - action: hattrick.set_match_orders
+      data:
+        match_id: "{{ state_attr('sensor.prossima_partita', 'match_id') }}"
+        tactic_type: 1
+        tactic_skill: 5
+        attitude: 0
+  mode: single

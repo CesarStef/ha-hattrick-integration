@@ -1,0 +1,76 @@
+# Dashboard Lovelace di esempio per l'integrazione Hattrick.
+#
+# Come usarla:
+#   1. In Home Assistant: Impostazioni -> Dashboard -> "+" (nuova dashboard, modalità YAML)
+#      oppure aggiungi una vista a una dashboard esistente copiando il contenuto di `views:`.
+#   2. Sostituisci gli entity_id (sensor.*) con quelli reali della tua squadra:
+#      si trovano in Impostazioni -> Dispositivi e servizi -> Hattrick -> dispositivo squadra,
+#      oppure in Strumenti sviluppatore -> Stati. Con più squadre configurate HA può
+#      aggiungere un suffisso numerico (es. sensor.cassa_2).
+#
+# I sensor diagnostici (dettaglio_ultima_partita, tattica_ultima_partita) mostrano dati
+# solo se hai abilitato i file "matchdetails" e "matchlineup" nelle opzioni dell'integrazione.
+
+title: Hattrick
+views:
+  - title: Squadra
+    cards:
+      - type: entities
+        title: Panoramica
+        entities:
+          - sensor.nome_squadra
+          - sensor.posizione_in_classifica
+          - sensor.cassa
+          - sensor.entrate_previste
+          - sensor.morale
+          - sensor.fiducia_tifosi
+          - sensor.allenatore
+
+      - type: glance
+        title: Rosa
+        entities:
+          - sensor.giocatori
+          - sensor.tsi_totale
+          - sensor.forma_squadra
+          - sensor.infortunati
+          - sensor.squalificati
+
+      - type: entities
+        title: Prossima partita
+        entities:
+          - sensor.prossima_partita
+          - sensor.partite_programmate
+          - sensor.ultima_partita
+
+      - type: entities
+        title: Allenamento e stadio
+        entities:
+          - sensor.allenamento
+          - sensor.progresso_allenamento
+          - sensor.stadio
+          - sensor.orario_server_ht
+
+      - type: entities
+        title: Club
+        entities:
+          - sensor.fan_club
+          - sensor.settore_giovanile
+          - sensor.staff
+
+      - type: history-graph
+        title: Cassa (ultime 24h)
+        entities:
+          - sensor.cassa
+
+  - title: Partita
+    cards:
+      - type: entities
+        title: Ultima partita (diagnostico)
+        entities:
+          - sensor.dettaglio_ultima_partita
+          - sensor.tattica_ultima_partita
+
+      - type: entities
+        title: Rosa (attributi)
+        entities:
+          - sensor.giocatori
