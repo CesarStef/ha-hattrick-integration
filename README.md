@@ -32,4 +32,4 @@ Fase di documentazione e progettazione. Il codice dell'integrazione verrà svilu
 
 ## Licenza
 
-Da definire (suggerita: MIT).
+[Apache License 2.0](LICENSE) — Copyright 2026 Stefano Cattonar.

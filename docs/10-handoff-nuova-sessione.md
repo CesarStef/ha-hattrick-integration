@@ -15,6 +15,7 @@ esattamente da dove ripartire. Aggiornarlo a ogni milestone.
 ```
 ha-hattrick-integration/
 ├── README.md
+├── LICENSE                        # Apache License 2.0
 ├── hacs.json
 ├── pyproject.toml                 # ruff (py313, line-length 100) + pytest
 ├── requirements_test.txt          # ruff, pytest, pytest-asyncio, pytest-cov,
