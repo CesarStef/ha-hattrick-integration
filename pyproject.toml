@@ -8,6 +8,7 @@ requires-python = ">=3.13"
 target-version = "py313"
 line-length = 100
 src = ["custom_components"]
+exclude = ["docs"]
 
 [tool.ruff.lint]
 select = [
