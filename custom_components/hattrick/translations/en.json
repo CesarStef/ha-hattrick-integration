@@ -178,6 +178,48 @@
           "description": "Optional: which configured team to use, if you have more than one."
         }
       }
+    },
+    "set_match_orders": {
+      "name": "Set match orders",
+      "description": "Sends match orders to Hattrick (tactic, lineup, captain, penalty takers) via matchorders.xml, then refreshes data. Requires write permission on the CHPP app.",
+      "fields": {
+        "match_id": {
+          "name": "Match ID",
+          "description": "MatchID of the match (e.g. from the match_id attribute of the next match sensor)."
+        },
+        "config_entry": {
+          "name": "Team (config entry)",
+          "description": "Optional: which configured team to use, if you have more than one."
+        },
+        "tactic_type": {
+          "name": "Tactic",
+          "description": "Tactic type (normal, pressing, counter-attack, long shots, creative, relax)."
+        },
+        "tactic_skill": {
+          "name": "Tactic skill",
+          "description": "Tactic skill level, from 1 to 20."
+        },
+        "attitude": {
+          "name": "Attitude",
+          "description": "Defensive, normal or offensive."
+        },
+        "captain_id": {
+          "name": "Captain ID",
+          "description": "PlayerID of the captain."
+        },
+        "set_pieces_taker_id": {
+          "name": "Set pieces taker ID",
+          "description": "PlayerID of the set pieces taker."
+        },
+        "penalty_takers": {
+          "name": "Penalty takers",
+          "description": "List of PlayerIDs of penalty takers, in order."
+        },
+        "lineup": {
+          "name": "Lineup",
+          "description": "List of {player_id, position_code} objects for starters and bench."
+        }
+      }
     }
   }
 }

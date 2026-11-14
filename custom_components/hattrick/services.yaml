@@ -24,3 +24,71 @@ get_player:
       selector:
         config_entry:
           integration: hattrick
+set_match_orders:
+  fields:
+    match_id:
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: hattrick
+    tactic_type:
+      required: false
+      selector:
+        select:
+          options:
+            - value: "0"
+              label: "Normale"
+            - value: "1"
+              label: "Pressing"
+            - value: "2"
+              label: "Contropiede"
+            - value: "3"
+              label: "Palla lunga"
+            - value: "4"
+              label: "Creativa"
+            - value: "5"
+              label: "Relax"
+    tactic_skill:
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 20
+          mode: slider
+    attitude:
+      required: false
+      selector:
+        select:
+          options:
+            - value: "-1"
+              label: "Difensivo"
+            - value: "0"
+              label: "Normale"
+            - value: "1"
+              label: "Offensivo"
+    captain_id:
+      required: false
+      selector:
+        number:
+          min: 1
+          mode: box
+    set_pieces_taker_id:
+      required: false
+      selector:
+        number:
+          min: 1
+          mode: box
+    penalty_takers:
+      required: false
+      selector:
+        object:
+    lineup:
+      required: false
+      selector:
+        object:

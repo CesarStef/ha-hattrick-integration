@@ -8,9 +8,10 @@ from unittest import mock
 
 import pytest
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.hattrick.api import HattrickApiError
 from custom_components.hattrick.const import (
     CONF_ACCESS_TOKEN,
     CONF_ACCESS_TOKEN_SECRET,
@@ -48,10 +49,21 @@ ENTRY_DATA = {
 class MockCHPPClient:
     def __init__(self, *args, **kwargs) -> None:
         self.calls: list[tuple[str, dict]] = []
+        self.posts: list[tuple[str, str]] = []
+        self.post_error: Exception | None = None
 
     async def async_get_file(self, hass, file: str, **params):
         self.calls.append((file, params))
         return ET.fromstring((FIXTURES_DIR / FILES[file]).read_text(encoding="utf-8"))
+
+    async def async_post_file(self, hass, file: str, body: str, **params):
+        if self.post_error is not None:
+            raise self.post_error
+        self.posts.append((file, body))
+        return ET.fromstring(
+            '<?xml version="1.0"?><HattrickData><FileName>matchorders</FileName>'
+            "<Version>1.0</Version></HattrickData>"
+        )
 
 
 async def _setup_entry(hass: HomeAssistant) -> MockConfigEntry:
@@ -115,3 +127,73 @@ async def test_services_removed_on_unload(hass: HomeAssistant):
     await hass.async_block_till_done()
     assert not hass.services.has_service(DOMAIN, "get_match_details")
     assert not hass.services.has_service(DOMAIN, "get_player")
+    assert not hass.services.has_service(DOMAIN, "set_match_orders")
+
+
+async def test_set_match_orders_posts_xml_and_returns_success(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    response = await hass.services.async_call(
+        DOMAIN,
+        "set_match_orders",
+        {
+            "match_id": 9002,
+            "tactic_type": 1,
+            "tactic_skill": 5,
+            "attitude": 1,
+            "captain_id": 1001,
+            "set_pieces_taker_id": 1003,
+            "penalty_takers": [1003, 1002],
+            "lineup": [
+                {"player_id": 1001, "position_code": 100},
+                {"player_id": 1002, "position_code": 101},
+            ],
+        },
+        blocking=True,
+        return_response=True,
+    )
+    assert response == {"success": True, "match_id": 9002}
+    assert len(coordinator.client.posts) == 1
+    file, body = coordinator.client.posts[0]
+    assert file == "matchorders"
+    assert "<MatchID>9002</MatchID>" in body
+    assert "<TacticType>1</TacticType>" in body
+    assert "<TacticSkill>5</TacticSkill>" in body
+    assert "<Attitude>1</Attitude>" in body
+    assert "<CaptainID>1001</CaptainID>" in body
+    assert "<SetPiecesTakerID>1003</SetPiecesTakerID>" in body
+    assert "<PenaltyTakerID>1003</PenaltyTakerID>" in body
+    assert "<PenaltyTakerID>1002</PenaltyTakerID>" in body
+    assert "<PlayerID>1001</PlayerID><PositionCode>100</PositionCode>" in body
+    assert "<PlayerID>1002</PlayerID><PositionCode>101</PositionCode>" in body
+    # il servizio ha forzato un refresh del coordinator
+    assert any(file == "teamdetails" for file, _ in coordinator.client.calls[1:])
+
+
+async def test_set_match_orders_minimal_body(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    response = await hass.services.async_call(
+        DOMAIN,
+        "set_match_orders",
+        {"match_id": 9002},
+        blocking=True,
+        return_response=True,
+    )
+    assert response["success"] is True
+    _, body = coordinator.client.posts[0]
+    assert body == "<MatchOrders><MatchID>9002</MatchID></MatchOrders>"
+
+
+async def test_set_match_orders_api_error_raises(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator.client.post_error = HattrickApiError("permesso negato")
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(
+            DOMAIN,
+            "set_match_orders",
+            {"match_id": 9002},
+            blocking=True,
+            return_response=True,
+        )

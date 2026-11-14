@@ -116,3 +116,45 @@ def test_get_access_token_sync_wraps_value_error_as_auth_error():
         session_cls.return_value.fetch_access_token.side_effect = ValueError("denied")
         with pytest.raises(HattrickAuthError):
             _client().get_access_token_sync("rt", "rts", "bad")
+
+
+def test_post_file_sync_ok():
+    ok_xml = (
+        '<?xml version="1.0"?><HattrickData><FileName>matchorders</FileName>'
+        "<Version>1.0</Version></HattrickData>"
+    )
+    with mock.patch.object(api, "OAuth1Session") as session_cls:
+        session = session_cls.return_value
+        session.post.return_value = FakeResponse(200, ok_xml)
+        body = "<MatchOrders><MatchID>9002</MatchID></MatchOrders>"
+        root = _client().post_file_sync("matchorders", body)
+    assert root.findtext("FileName") == "matchorders"
+    _, kwargs = session.post.call_args
+    assert kwargs["params"]["file"] == "matchorders"
+    assert b"<MatchID>9002</MatchID>" in kwargs["data"]
+    assert kwargs["headers"]["Content-Type"].startswith("application/xml")
+
+
+def test_post_file_sync_http_403_is_auth_error():
+    with mock.patch.object(api, "OAuth1Session") as session_cls:
+        session_cls.return_value.post.return_value = FakeResponse(403, "")
+        with pytest.raises(HattrickAuthError):
+            _client().post_file_sync("matchorders", "<MatchOrders/>")
+
+
+def test_post_file_sync_xml_error_is_api_error():
+    xml = (
+        '<?xml version="1.0"?><HattrickData><Error>Match orders not allowed</Error></HattrickData>'
+    )
+    with mock.patch.object(api, "OAuth1Session") as session_cls:
+        session_cls.return_value.post.return_value = FakeResponse(200, xml)
+        with pytest.raises(HattrickApiError, match="not allowed"):
+            _client().post_file_sync("matchorders", "<MatchOrders/>")
+
+
+async def test_async_post_file_uses_executor():
+    ok_xml = '<?xml version="1.0"?><HattrickData><FileName>matchorders</FileName></HattrickData>'
+    with mock.patch.object(api, "OAuth1Session") as session_cls:
+        session_cls.return_value.post.return_value = FakeResponse(200, ok_xml)
+        root = await _client().async_post_file(FakeHass(), "matchorders", "<MatchOrders/>")
+    assert root.findtext("FileName") == "matchorders"

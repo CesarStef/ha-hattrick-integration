@@ -110,22 +110,16 @@ class HattrickCHPPClient:
         return token["oauth_token"], token["oauth_token_secret"]
 
     # ------------------------------------------------------------------
-    # Lettura dei file XML CHPP
+    # Lettura/scrittura dei file XML CHPP
     # ------------------------------------------------------------------
 
-    def get_file_sync(self, file: str, **params: Any) -> ET.Element:
-        """Scarica un file CHPP (bloccante) e restituisce la root dell'XML.
+    @staticmethod
+    def _parse_response(resp: requests.Response) -> ET.Element:
+        """Valida la risposta HTTP e restituisce la root dell'XML.
 
-        Solleva HattrickAuthError se le credenziali non sono valide,
+        Solleva HattrickAuthError per 401/403 o errori di token,
         HattrickApiError per ogni altro errore.
         """
-        version = params.pop("version", None) or FILE_VERSIONS.get(file, "1.0")
-        query: dict[str, Any] = {"file": file, "version": version, **params}
-        try:
-            resp = self._session.get(CHPP_XML_URL, params=query, timeout=REQUEST_TIMEOUT)
-        except requests.RequestException as err:
-            raise HattrickApiError(f"Errore di rete verso CHPP: {err}") from err
-
         if resp.status_code in (401, 403):
             raise HattrickAuthError("Credenziali CHPP non valide o token revocato")
         if resp.status_code == 429:
@@ -146,6 +140,45 @@ class HattrickCHPPClient:
             raise HattrickApiError(error)
         return root
 
+    def get_file_sync(self, file: str, **params: Any) -> ET.Element:
+        """Scarica un file CHPP (bloccante) e restituisce la root dell'XML.
+
+        Solleva HattrickAuthError se le credenziali non sono valide,
+        HattrickApiError per ogni altro errore.
+        """
+        version = params.pop("version", None) or FILE_VERSIONS.get(file, "1.0")
+        query: dict[str, Any] = {"file": file, "version": version, **params}
+        try:
+            resp = self._session.get(CHPP_XML_URL, params=query, timeout=REQUEST_TIMEOUT)
+        except requests.RequestException as err:
+            raise HattrickApiError(f"Errore di rete verso CHPP: {err}") from err
+        return self._parse_response(resp)
+
     async def async_get_file(self, hass: HomeAssistant, file: str, **params: Any) -> ET.Element:
         """Versione async di get_file_sync, eseguita in executor."""
         return await hass.async_add_executor_job(partial(self.get_file_sync, file, **params))
+
+    def post_file_sync(self, file: str, body: str, **params: Any) -> ET.Element:
+        """Invia un corpo XML a un file CHPP in POST (es. matchorders).
+
+        Il corpo XML contiene i dati (MatchID, ordini, ecc.); `params` va
+        nella query string. Restituisce la root della risposta XML.
+        """
+        query: dict[str, Any] = {"file": file, **params}
+        try:
+            resp = self._session.post(
+                CHPP_XML_URL,
+                params=query,
+                data=body.encode("utf-8"),
+                headers={"Content-Type": "application/xml; charset=utf-8"},
+                timeout=REQUEST_TIMEOUT,
+            )
+        except requests.RequestException as err:
+            raise HattrickApiError(f"Errore di rete verso CHPP: {err}") from err
+        return self._parse_response(resp)
+
+    async def async_post_file(
+        self, hass: HomeAssistant, file: str, body: str, **params: Any
+    ) -> ET.Element:
+        """Versione async di post_file_sync, eseguita in executor."""
+        return await hass.async_add_executor_job(partial(self.post_file_sync, file, body, **params))

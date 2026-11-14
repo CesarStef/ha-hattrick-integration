@@ -178,6 +178,48 @@
           "description": "Opzionale: quale squadra configurata usare, se ne hai più di una."
         }
       }
+    },
+    "set_match_orders": {
+      "name": "Invia ordini di partita",
+      "description": "Invia a Hattrick gli ordini per una partita (tattica, formazione, capitano, rigoristi) tramite matchorders.xml, poi aggiorna i dati. Richiede il permesso di scrittura sull'app CHPP.",
+      "fields": {
+        "match_id": {
+          "name": "ID partita",
+          "description": "MatchID della partita (es. dall'attributo match_id del sensor prossima partita)."
+        },
+        "config_entry": {
+          "name": "Squadra (config entry)",
+          "description": "Opzionale: quale squadra configurata usare, se ne hai più di una."
+        },
+        "tactic_type": {
+          "name": "Tattica",
+          "description": "Tipo di tattica (normale, pressing, contropiede, palla lunga, creativa, relax)."
+        },
+        "tactic_skill": {
+          "name": "Livello tattica",
+          "description": "Abilità della tattica, da 1 a 20."
+        },
+        "attitude": {
+          "name": "Atteggiamento",
+          "description": "Difensivo, normale o offensivo."
+        },
+        "captain_id": {
+          "name": "ID capitano",
+          "description": "PlayerID del capitano."
+        },
+        "set_pieces_taker_id": {
+          "name": "ID calci piazzati",
+          "description": "PlayerID del tiratore di calci piazzati."
+        },
+        "penalty_takers": {
+          "name": "Rigoristi",
+          "description": "Lista di PlayerID dei rigoristi, in ordine."
+        },
+        "lineup": {
+          "name": "Formazione",
+          "description": "Lista di oggetti {player_id, position_code} per titolari e panchina."
+        }
+      }
     }
   }
 }
