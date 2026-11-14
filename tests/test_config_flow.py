@@ -93,6 +93,10 @@ async def test_manual_flow_invalid_auth(hass):
 async def test_auto_flow_creates_entry(hass, mock_client):
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"mode": "auto"})
+    assert result["step_id"] == "app"
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_CONSUMER_KEY: "ck", CONF_CONSUMER_SECRET: "cs"}
+    )
     assert result["step_id"] == "auth"
     assert (
         "authorize.aspx?oauth_token=reqtok" in result["description_placeholders"]["authorize_url"]
@@ -101,14 +105,34 @@ async def test_auto_flow_creates_entry(hass, mock_client):
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["title"] == "Squadra di Test"
     assert result["data"][CONF_ACCESS_TOKEN] == "newat"
+    assert result["data"][CONF_CONSUMER_KEY] == "ck"
 
 
 async def test_auto_flow_bad_verifier(hass, mock_client):
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"mode": "auto"})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_CONSUMER_KEY: "ck", CONF_CONSUMER_SECRET: "cs"}
+    )
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"verifier": "bad"})
     assert result["type"] == FlowResultType.FORM
     assert result["errors"]["base"] == "invalid_verifier"
+
+
+async def test_auto_flow_request_token_denied_shows_error_not_crash(hass):
+    class DeniedClient(FakeCHPPClient):
+        def get_request_token_sync(self, callback_url: str = "oob"):
+            raise HattrickAuthError("CHPP ha rifiutato il request token")
+
+    with mock.patch("custom_components.hattrick.config_flow.HattrickCHPPClient", DeniedClient):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {"mode": "auto"})
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_CONSUMER_KEY: "bad", CONF_CONSUMER_SECRET: "bad"}
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "auth"
+        assert result["errors"]["base"] == "invalid_auth"
 
 
 async def test_duplicate_account_aborts(hass, mock_client):

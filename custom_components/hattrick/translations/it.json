@@ -31,6 +31,14 @@
         "data": {
           "verifier": "Verifier"
         }
+      },
+      "app": {
+        "title": "App CHPP",
+        "description": "Inserisci Consumer Key e Consumer Secret dell'app registrata su chpp.hattrick.org (Community → CHPP → la tua app).",
+        "data": {
+          "consumer_key": "Consumer Key",
+          "consumer_secret": "Consumer Secret"
+        }
       }
     },
     "error": {

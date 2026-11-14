@@ -73,7 +73,15 @@ class HattrickCHPPClient:
         try:
             token = session.fetch_request_token(OAUTH_REQUEST_TOKEN_URL, timeout=REQUEST_TIMEOUT)
         except requests.RequestException as err:
-            raise HattrickApiError(f"Errore nel richiedere il request token: {err}") from err
+            raise HattrickApiError(
+                f"Errore di rete nel richiedere il request token: {err}"
+            ) from err
+        except ValueError as err:
+            # requests-oauthlib solleva TokenRequestDenied (ValueError) se CHPP
+            # rifiuta la richiesta, es. consumer key/secret errati.
+            raise HattrickAuthError(
+                f"CHPP ha rifiutato il request token (consumer key/secret non validi?): {err}"
+            ) from err
         return token["oauth_token"], token["oauth_token_secret"]
 
     @staticmethod
@@ -95,6 +103,9 @@ class HattrickCHPPClient:
         try:
             token = session.fetch_access_token(OAUTH_ACCESS_TOKEN_URL, timeout=REQUEST_TIMEOUT)
         except requests.RequestException as err:
+            raise HattrickApiError(f"Errore di rete nello scambio del token: {err}") from err
+        except ValueError as err:
+            # TokenExchangeDenied (ValueError): verifier non valido o scaduto.
             raise HattrickAuthError(f"Verifier non valido o scaduto: {err}") from err
         return token["oauth_token"], token["oauth_token_secret"]
 

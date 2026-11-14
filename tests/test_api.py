@@ -101,3 +101,18 @@ async def test_async_get_file_uses_executor():
 def test_authorize_url():
     url = HattrickCHPPClient.get_authorize_url("tok123")
     assert url == "https://chpp.hattrick.org/oauth/authorize.aspx?oauth_token=tok123"
+
+
+def test_get_request_token_sync_wraps_value_error_as_auth_error():
+    # requests-oauthlib solleva TokenRequestDenied (ValueError) se CHPP rifiuta
+    with mock.patch.object(api, "OAuth1Session") as session_cls:
+        session_cls.return_value.fetch_request_token.side_effect = ValueError("denied")
+        with pytest.raises(HattrickAuthError):
+            _client().get_request_token_sync()
+
+
+def test_get_access_token_sync_wraps_value_error_as_auth_error():
+    with mock.patch.object(api, "OAuth1Session") as session_cls:
+        session_cls.return_value.fetch_access_token.side_effect = ValueError("denied")
+        with pytest.raises(HattrickAuthError):
+            _client().get_access_token_sync("rt", "rts", "bad")

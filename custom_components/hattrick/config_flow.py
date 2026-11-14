@@ -58,6 +58,13 @@ STEP_USER_SCHEMA = vol.Schema(
     }
 )
 
+APP_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_CONSUMER_KEY): str,
+        vol.Required(CONF_CONSUMER_SECRET): str,
+    }
+)
+
 MANUAL_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_CONSUMER_KEY): str,
@@ -127,8 +134,23 @@ class HattrickConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             if user_input["mode"] == MODE_MANUAL:
                 return await self.async_step_manual()
-            return await self.async_step_auth()
+            return await self.async_step_app()
         return self.async_show_form(step_id="user", data_schema=STEP_USER_SCHEMA)
+
+    # ------------------------------------------------------------------
+    # Modalità automatica: prima le credenziali dell'app CHPP
+    # ------------------------------------------------------------------
+
+    async def async_step_app(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """L'utente incolla consumer key/secret dell'app registrata su chpp.hattrick.org."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            self._consumer_key = user_input[CONF_CONSUMER_KEY].strip()
+            self._consumer_secret = user_input[CONF_CONSUMER_SECRET].strip()
+            if self._consumer_key and self._consumer_secret:
+                return await self.async_step_auth()
+            errors["base"] = "invalid_auth"
+        return self.async_show_form(step_id="app", data_schema=APP_SCHEMA, errors=errors)
 
     # ------------------------------------------------------------------
     # Modalità manuale
@@ -170,6 +192,9 @@ class HattrickConfigFlow(ConfigFlow, domain=DOMAIN):
                 self._request_token,
                 self._request_token_secret,
             ) = await self.hass.async_add_executor_job(client.get_request_token_sync)
+        except HattrickAuthError as err:
+            errors["base"] = "invalid_auth"
+            _LOGGER.warning("CHPP ha rifiutato il request token: %s", err)
         except HattrickApiError as err:
             errors["base"] = "cannot_connect"
             _LOGGER.warning("Impossibile ottenere il request token CHPP: %s", err)

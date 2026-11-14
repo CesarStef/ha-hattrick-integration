@@ -21,7 +21,7 @@ Al primo passo (`async_step_user`) l'utente sceglie come collegare l'account:
 
 | Modalità | Come funziona | Quando usarla |
 |----------|---------------|---------------|
-| **Automatica (consigliata)** | HA genera il request token, mostra un link a `chpp.hattrick.org/oauth/authorize.aspx?oauth_token=...`; l'utente apre il link, fa login su Hattrick, clicca **Allow** e incolla il **verifier** mostrato. HA scambia il verifier con l'access token. | Sempre, se possibile |
+| **Automatica (consigliata)** | Prima chiede **Consumer Key/Secret** dell'app registrata su chpp.hattrick.org (step `app`), poi HA genera il request token, mostra un link a `chpp.hattrick.org/oauth/authorize.aspx?oauth_token=...`; l'utente apre il link, fa login su Hattrick, clicca **Allow** e incolla il **verifier** mostrato. HA scambia il verifier con l'access token. | Sempre, se possibile |
 | **Manuale** | L'utente ha già una coppia Consumer Key/Secret (registrata su chpp.hattrick.org) e una coppia Access Token/Secret (ottenuta autorizzando la propria app), e le incolla direttamente. | Utenti avanzati, o se il flusso automatico dà problemi |
 
 > In nessuna modalità l'utente inserisce la password di Hattrick: il login avviene solo
@@ -30,7 +30,9 @@ Al primo passo (`async_step_user`) l'utente sceglie come collegare l'account:
 ## 3. Passi del flusso automatico (config flow)
 
 1. **user**: scelta "automatica".
-2. **auth**: HA chiama `requesttoken.aspx`, poi mostra:
+2. **app**: l'utente incolla Consumer Key/Secret della propria app CHPP (da
+   chpp.hattrick.org). Se CHPP rifiuta il request token → errore "invalid_auth".
+3. **auth**: HA chiama `requesttoken.aspx`, poi mostra:
    - il link di autorizzazione (con `oauth_token`);
    - un campo di testo per il **verifier** (codice che Hattrick mostra dopo il consenso,
      oppure `oauth_verifier` nel callback se configurato).
