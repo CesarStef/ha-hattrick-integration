@@ -92,3 +92,10 @@ set_match_orders:
       required: false
       selector:
         object:
+refresh:
+  fields:
+    config_entry:
+      required: false
+      selector:
+        config_entry:
+          integration: hattrick

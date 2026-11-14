@@ -220,6 +220,16 @@
           "description": "Lista di oggetti {player_id, position_code} per titolari e panchina."
         }
       }
+    },
+    "refresh": {
+      "name": "Aggiorna dati Hattrick",
+      "description": "Forza un aggiornamento immediato dei dati CHPP, senza aspettare il prossimo polling.",
+      "fields": {
+        "config_entry": {
+          "name": "Squadra (config entry)",
+          "description": "Opzionale: quale squadra aggiornare; se omesso le aggiorna tutte."
+        }
+      }
     }
   }
 }

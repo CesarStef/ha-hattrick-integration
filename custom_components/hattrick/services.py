@@ -20,6 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 SERVICE_GET_MATCH_DETAILS = "get_match_details"
 SERVICE_GET_PLAYER = "get_player"
 SERVICE_SET_MATCH_ORDERS = "set_match_orders"
+SERVICE_REFRESH = "refresh"
 
 CONF_MATCH_ID = "match_id"
 CONF_PLAYER_ID = "player_id"
@@ -34,6 +35,11 @@ GET_MATCH_DETAILS_SCHEMA = vol.Schema(
 GET_PLAYER_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_PLAYER_ID): cv.positive_int,
+        vol.Optional(CONF_CONFIG_ENTRY): str,
+    }
+)
+REFRESH_SCHEMA = vol.Schema(
+    {
         vol.Optional(CONF_CONFIG_ENTRY): str,
     }
 )
@@ -190,12 +196,29 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         schema=GET_PLAYER_SCHEMA,
         supports_response=SupportsResponse.ONLY,
     )
+
+    async def handle_refresh(call: ServiceCall) -> None:
+        """Forza un aggiornamento immediato dei dati CHPP."""
+        entry_id = call.data.get(CONF_CONFIG_ENTRY)
+        if entry_id:
+            coordinator = _coordinator_for(hass, call)
+            await coordinator.async_request_refresh()
+            return
+        for coordinator in _coordinators(hass):
+            await coordinator.async_request_refresh()
+
     hass.services.async_register(
         DOMAIN,
         SERVICE_SET_MATCH_ORDERS,
         handle_set_match_orders,
         schema=SET_MATCH_ORDERS_SCHEMA,
         supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_REFRESH,
+        handle_refresh,
+        schema=REFRESH_SCHEMA,
     )
 
 
@@ -207,3 +230,4 @@ async def async_unload_services(hass: HomeAssistant) -> None:
     hass.services.async_remove(DOMAIN, SERVICE_GET_MATCH_DETAILS)
     hass.services.async_remove(DOMAIN, SERVICE_GET_PLAYER)
     hass.services.async_remove(DOMAIN, SERVICE_SET_MATCH_ORDERS)
+    hass.services.async_remove(DOMAIN, SERVICE_REFRESH)

@@ -220,6 +220,16 @@
           "description": "List of {player_id, position_code} objects for starters and bench."
         }
       }
+    },
+    "refresh": {
+      "name": "Refresh Hattrick data",
+      "description": "Forces an immediate refresh of CHPP data, without waiting for the next polling cycle.",
+      "fields": {
+        "config_entry": {
+          "name": "Team (config entry)",
+          "description": "Optional: which team to refresh; if omitted, refreshes all of them."
+        }
+      }
     }
   }
 }

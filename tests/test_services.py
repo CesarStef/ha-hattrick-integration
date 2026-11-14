@@ -128,6 +128,7 @@ async def test_services_removed_on_unload(hass: HomeAssistant):
     assert not hass.services.has_service(DOMAIN, "get_match_details")
     assert not hass.services.has_service(DOMAIN, "get_player")
     assert not hass.services.has_service(DOMAIN, "set_match_orders")
+    assert not hass.services.has_service(DOMAIN, "refresh")
 
 
 async def test_set_match_orders_posts_xml_and_returns_success(hass: HomeAssistant):
@@ -196,4 +197,32 @@ async def test_set_match_orders_api_error_raises(hass: HomeAssistant):
             {"match_id": 9002},
             blocking=True,
             return_response=True,
+        )
+
+
+async def test_refresh_triggers_coordinator_update(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    calls_before = len(coordinator.client.calls)
+    await hass.services.async_call(DOMAIN, "refresh", {}, blocking=True)
+    await hass.async_block_till_done()
+    assert len(coordinator.client.calls) > calls_before
+
+
+async def test_refresh_with_config_entry(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    calls_before = len(coordinator.client.calls)
+    await hass.services.async_call(
+        DOMAIN, "refresh", {"config_entry": entry.entry_id}, blocking=True
+    )
+    await hass.async_block_till_done()
+    assert len(coordinator.client.calls) > calls_before
+
+
+async def test_refresh_unknown_config_entry_raises(hass: HomeAssistant):
+    await _setup_entry(hass)
+    with pytest.raises(ServiceValidationError):
+        await hass.services.async_call(
+            DOMAIN, "refresh", {"config_entry": "inesistente"}, blocking=True
         )

@@ -1,0 +1,16 @@
+{
+  "services": {
+    "hattrick.get_match_details": {
+      "service": "mdi:scoreboard"
+    },
+    "hattrick.get_player": {
+      "service": "mdi:account"
+    },
+    "hattrick.set_match_orders": {
+      "service": "mdi:whistle"
+    },
+    "hattrick.refresh": {
+      "service": "mdi:refresh"
+    }
+  }
+}
