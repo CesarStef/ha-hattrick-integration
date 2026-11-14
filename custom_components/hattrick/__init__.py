@@ -14,7 +14,10 @@ from .const import (
     CONF_ACCESS_TOKEN_SECRET,
     CONF_CONSUMER_KEY,
     CONF_CONSUMER_SECRET,
+    CONF_ENABLED_FILES,
+    CONF_MATCHDAY,
     CONF_SCAN_INTERVAL,
+    DEFAULT_ENABLED_FILES,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
@@ -36,8 +39,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: HattrickConfigEntry) -> 
     interval_minutes = entry.options.get(
         CONF_SCAN_INTERVAL, int(DEFAULT_SCAN_INTERVAL.total_seconds() // 60)
     )
+    enabled_files = entry.options.get(CONF_ENABLED_FILES, list(DEFAULT_ENABLED_FILES))
+    matchday = entry.options.get(CONF_MATCHDAY, False)
     coordinator = HattrickDataUpdateCoordinator(
-        hass, entry, client, update_interval=timedelta(minutes=interval_minutes)
+        hass,
+        entry,
+        client,
+        update_interval=timedelta(minutes=interval_minutes),
+        enabled_files=enabled_files,
+        matchday=matchday,
     )
     await coordinator.async_config_entry_first_refresh()
 

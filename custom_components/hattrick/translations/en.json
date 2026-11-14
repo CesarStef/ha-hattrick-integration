@@ -49,7 +49,8 @@
         "title": "Hattrick options",
         "data": {
           "scan_interval": "Update interval (minutes)",
-          "enabled_files": "CHPP files to download"
+          "enabled_files": "CHPP files to download",
+          "matchday": "Matchday mode (5 min polling during match windows)"
         }
       }
     }
@@ -64,29 +65,75 @@
   },
   "entity": {
     "sensor": {
-      "team_name": { "name": "Team name" },
-      "morale": { "name": "Morale" },
-      "fiducia_tifosi": { "name": "Fan confidence" },
-      "cassa": { "name": "Cash" },
-      "giocatori": { "name": "Players" },
-      "tsi_totale": { "name": "Total TSI" },
-      "infortunati": { "name": "Injured" },
-      "squalificati": { "name": "Suspended" },
-      "forma_squadra": { "name": "Team form" },
-      "fanclub": { "name": "Fan club" },
-      "settore_giovanile": { "name": "Youth squad" },
-      "staff": { "name": "Staff" },
-      "posizione": { "name": "League position" },
-      "prossima_partita": { "name": "Next match" },
-      "ultima_partita": { "name": "Last match" },
-      "partite_programmate": { "name": "Scheduled matches" },
-      "entrate_previste": { "name": "Expected income" },
-      "stipendi": { "name": "Wages" },
-      "allenatore": { "name": "Coach" },
-      "allenamento": { "name": "Training" },
-      "progresso_allenamento": { "name": "Training progress" },
-      "stadio": { "name": "Arena" },
-      "server_time": { "name": "HT server time" }
+      "team_name": {
+        "name": "Team name"
+      },
+      "morale": {
+        "name": "Morale"
+      },
+      "fiducia_tifosi": {
+        "name": "Fan confidence"
+      },
+      "cassa": {
+        "name": "Cash"
+      },
+      "giocatori": {
+        "name": "Players"
+      },
+      "tsi_totale": {
+        "name": "Total TSI"
+      },
+      "infortunati": {
+        "name": "Injured"
+      },
+      "squalificati": {
+        "name": "Suspended"
+      },
+      "forma_squadra": {
+        "name": "Team form"
+      },
+      "fanclub": {
+        "name": "Fan club"
+      },
+      "settore_giovanile": {
+        "name": "Youth squad"
+      },
+      "staff": {
+        "name": "Staff"
+      },
+      "posizione": {
+        "name": "League position"
+      },
+      "prossima_partita": {
+        "name": "Next match"
+      },
+      "ultima_partita": {
+        "name": "Last match"
+      },
+      "partite_programmate": {
+        "name": "Scheduled matches"
+      },
+      "entrate_previste": {
+        "name": "Expected income"
+      },
+      "stipendi": {
+        "name": "Wages"
+      },
+      "allenatore": {
+        "name": "Coach"
+      },
+      "allenamento": {
+        "name": "Training"
+      },
+      "progresso_allenamento": {
+        "name": "Training progress"
+      },
+      "stadio": {
+        "name": "Arena"
+      },
+      "server_time": {
+        "name": "HT server time"
+      }
     }
   }
 }

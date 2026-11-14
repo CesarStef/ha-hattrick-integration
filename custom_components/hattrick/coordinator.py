@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -12,8 +12,15 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import HattrickApiError, HattrickAuthError, HattrickCHPPClient
-from .const import DEFAULT_ENABLED_FILES, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import (
+    DEFAULT_ENABLED_FILES,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+    MATCHDAY_INTERVAL,
+    MATCHDAY_WINDOW,
+)
 from .models import (
+    HTT_TIMEZONE,
     Arena,
     Club,
     Economy,
@@ -26,6 +33,7 @@ from .models import (
     Training,
     TrainingSummary,
     World,
+    htt_to_aware,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -56,6 +64,7 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
         client: HattrickCHPPClient,
         update_interval: timedelta = DEFAULT_SCAN_INTERVAL,
         enabled_files: tuple[str, ...] | list[str] = DEFAULT_ENABLED_FILES,
+        matchday: bool = False,
     ) -> None:
         """Inizializza il coordinator."""
         super().__init__(
@@ -67,6 +76,8 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
         )
         self.client = client
         self.enabled_files = tuple(enabled_files)
+        self.base_interval = update_interval
+        self.matchday = matchday
 
     async def _async_update_data(self) -> HattrickData:
         """Scarica i file abilitati in parallelo e costruisce il modello dati."""
@@ -88,7 +99,7 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
             if file in data_by_file:
                 optional[file] = parser.from_xml(data_by_file[file])
 
-        return HattrickData(
+        data = HattrickData(
             team=Team.from_xml(data_by_file["teamdetails"]),
             mood=TeamMood.from_xml(data_by_file["team"]),
             economy=Economy.from_xml(data_by_file["economy"]),
@@ -101,3 +112,20 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
             arena=optional.get("arenadetails"),  # type: ignore[arg-type]
             world=optional.get("worlddetails"),  # type: ignore[arg-type]
         )
+        self._apply_matchday_interval(data)
+        return data
+
+    def _apply_matchday_interval(self, data: HattrickData) -> None:
+        """Riduce l'intervallo a 5 min dentro la finestra di partita (se matchday attivo)."""
+        if not self.matchday:
+            return
+        nxt = data.matches.next_match if data.matches else None
+        if nxt is None or nxt.date is datetime.min:
+            self.update_interval = self.base_interval
+            return
+        now_htt = datetime.now(HTT_TIMEZONE)
+        kickoff = htt_to_aware(nxt.date)
+        if abs(kickoff - now_htt) <= MATCHDAY_WINDOW:
+            self.update_interval = MATCHDAY_INTERVAL
+        else:
+            self.update_interval = self.base_interval

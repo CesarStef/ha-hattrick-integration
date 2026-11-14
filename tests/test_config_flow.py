@@ -144,7 +144,13 @@ async def test_options_flow(hass, mock_client):
     assert result["step_id"] == "init"
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        {"scan_interval": 30, "enabled_files": ["teamdetails", "economy"]},
+        {
+            "scan_interval": 30,
+            "enabled_files": ["teamdetails", "economy"],
+            "matchday": True,
+        },
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"]["scan_interval"] == 30
+    assert result["data"]["enabled_files"] == ["teamdetails", "economy"]
+    assert result["data"]["matchday"] is True

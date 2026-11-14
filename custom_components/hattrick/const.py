@@ -18,10 +18,15 @@ CONF_ACCESS_TOKEN = "access_token"
 CONF_ACCESS_TOKEN_SECRET = "access_token_secret"
 CONF_SCAN_INTERVAL = "scan_interval"
 CONF_ENABLED_FILES = "enabled_files"
+CONF_MATCHDAY = "matchday"
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=15)
 MIN_SCAN_INTERVAL = timedelta(minutes=5)
 MAX_SCAN_INTERVAL = timedelta(minutes=60)
+
+# Modalità matchday: polling ridotto dentro la finestra di partita (HTT).
+MATCHDAY_INTERVAL = timedelta(minutes=5)
+MATCHDAY_WINDOW = timedelta(hours=3)
 
 # File CHPP scaricati nel ciclo standard del coordinator.
 # Le versioni sono quelle dichiarate dalla wiki CHPP: da riconfermare a ogni

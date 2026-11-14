@@ -31,6 +31,7 @@ from .const import (
     CONF_CONSUMER_KEY,
     CONF_CONSUMER_SECRET,
     CONF_ENABLED_FILES,
+    CONF_MATCHDAY,
     CONF_SCAN_INTERVAL,
     DEFAULT_ENABLED_FILES,
     DEFAULT_SCAN_INTERVAL,
@@ -284,6 +285,7 @@ class HattrickOptionsFlow(OptionsFlowWithConfigEntry):
         current_files = self.config_entry.options.get(
             CONF_ENABLED_FILES, list(DEFAULT_ENABLED_FILES)
         )
+        current_matchday = self.config_entry.options.get(CONF_MATCHDAY, False)
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
@@ -307,6 +309,9 @@ class HattrickOptionsFlow(OptionsFlowWithConfigEntry):
                                 mode=selector.SelectSelectorMode.LIST,
                             )
                         )
+                    ),
+                    vol.Required(CONF_MATCHDAY, default=current_matchday): (
+                        selector.BooleanSelector()
                     ),
                 }
             ),
