@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>leaguedetails</FileName>
+  <Version>2.5</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <Team>
+    <TeamID>7654321</TeamID>
+    <TeamName>Squadra di Test</TeamName>
+    <LeagueLevelUnitID>555001</LeagueLevelUnitID>
+    <LeagueLevelUnitName>Serie Test</LeagueLevelUnitName>
+    <LeagueLevel>3</LeagueLevel>
+    <MaxNumberOfTeams>8</MaxNumberOfTeams>
+    <CurrentMatchRound>5</CurrentMatchRound>
+    <TeamPosition>3</TeamPosition>
+    <MatchList>
+      <Match>
+        <MatchID>9001</MatchID>
+        <MatchRound>4</MatchRound>
+        <HomeTeam>
+          <HomeTeamID>7654321</HomeTeamID>
+          <HomeTeamName>Squadra di Test</HomeTeamName>
+          <HomeGoals>3</HomeGoals>
+        </HomeTeam>
+        <AwayTeam>
+          <AwayTeamID>8000001</AwayTeamID>
+          <AwayTeamName>Avversari FC</AwayTeamName>
+          <AwayGoals>1</AwayGoals>
+        </AwayTeam>
+        <MatchDate>2026-11-07 19:30:00</MatchDate>
+      </Match>
+      <Match>
+        <MatchID>9002</MatchID>
+        <MatchRound>5</MatchRound>
+        <HomeTeam>
+          <HomeTeamID>8000002</HomeTeamID>
+          <HomeTeamName>Altra Squadra</HomeTeamName>
+        </HomeTeam>
+        <AwayTeam>
+          <AwayTeamID>7654321</AwayTeamID>
+          <AwayTeamName>Squadra di Test</AwayTeamName>
+        </AwayTeam>
+        <MatchDate>2026-11-14 19:30:00</MatchDate>
+      </Match>
+    </MatchList>
+  </Team>
+</HattrickData>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>matches</FileName>
+  <Version>3.0</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <Team>
+    <TeamID>7654321</TeamID>
+    <TeamName>Squadra di Test</TeamName>
+    <MatchList>
+      <Match>
+        <MatchID>9001</MatchID>
+        <MatchDate>2026-11-07 19:30:00</MatchDate>
+        <MatchType>1</MatchType>
+        <HomeTeam>
+          <HomeTeamID>7654321</HomeTeamID>
+          <HomeTeamName>Squadra di Test</HomeTeamName>
+          <HomeGoals>3</HomeGoals>
+        </HomeTeam>
+        <AwayTeam>
+          <AwayTeamID>8000001</AwayTeamID>
+          <AwayTeamName>Avversari FC</AwayTeamName>
+          <AwayGoals>1</AwayGoals>
+        </AwayTeam>
+        <Arena>
+          <ArenaID>7654322</ArenaID>
+          <ArenaName>Stadio di Test</ArenaName>
+        </Arena>
+      </Match>
+      <Match>
+        <MatchID>9002</MatchID>
+        <MatchDate>2026-11-14 19:30:00</MatchDate>
+        <MatchType>1</MatchType>
+        <HomeTeam>
+          <HomeTeamID>8000002</HomeTeamID>
+          <HomeTeamName>Altra Squadra</HomeTeamName>
+        </HomeTeam>
+        <AwayTeam>
+          <AwayTeamID>7654321</AwayTeamID>
+          <AwayTeamName>Squadra di Test</AwayTeamName>
+        </AwayTeam>
+        <Arena>
+          <ArenaID>8000003</ArenaID>
+          <ArenaName>Stadio Avversario</ArenaName>
+        </Arena>
+      </Match>
+      <Match>
+        <MatchID>9003</MatchID>
+        <MatchDate>2026-11-18 20:00:00</MatchDate>
+        <MatchType>3</MatchType>
+        <HomeTeam>
+          <HomeTeamID>7654321</HomeTeamID>
+          <HomeTeamName>Squadra di Test</HomeTeamName>
+        </HomeTeam>
+        <AwayTeam>
+          <AwayTeamID>8000004</AwayTeamID>
+          <AwayTeamName>Coppa United</AwayTeamName>
+        </AwayTeam>
+        <Arena>
+          <ArenaID>7654322</ArenaID>
+          <ArenaName>Stadio di Test</ArenaName>
+        </Arena>
+      </Match>
+    </MatchList>
+  </Team>
+</HattrickData>

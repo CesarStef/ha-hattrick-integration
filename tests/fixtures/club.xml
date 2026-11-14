@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>club</FileName>
+  <Version>1.5</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <Team>
+    <TeamID>7654321</TeamID>
+    <TeamName>Squadra di Test</TeamName>
+    <Fanclub>
+      <FanclubID>424242</FanclubID>
+      <FanclubName>Fan Club di Test</FanclubName>
+      <FanclubSize>1500</FanclubSize>
+    </Fanclub>
+    <YouthSquad>
+      <YouthSquadID>99</YouthSquadID>
+      <YouthSquadName>Giovanili di Test</YouthSquadName>
+      <YouthLevel>5</YouthLevel>
+    </YouthSquad>
+    <StaffList>
+      <Staff>
+        <Name>Dottor House</Name>
+        <StaffType>2</StaffType>
+        <StaffLevel>4</StaffLevel>
+        <Cost>20000</Cost>
+      </Staff>
+      <Staff>
+        <Name>Sig.ra Calma</Name>
+        <StaffType>3</StaffType>
+        <StaffLevel>3</StaffLevel>
+        <Cost>15000</Cost>
+      </Staff>
+      <Staff>
+        <Name>Signor Voce</Name>
+        <StaffType>4</StaffType>
+        <StaffLevel>2</StaffLevel>
+        <Cost>10000</Cost>
+      </Staff>
+    </StaffList>
+  </Team>
+</HattrickData>

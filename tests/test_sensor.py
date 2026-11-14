@@ -25,6 +25,14 @@ FILES = {
     "teamdetails": "teamdetails.xml",
     "team": "team.xml",
     "economy": "economy.xml",
+    "club": "club.xml",
+    "players": "players.xml",
+    "training": "training.xml",
+    "trainingsummary": "trainingsummary.xml",
+    "leaguedetails": "leaguedetails.xml",
+    "matches": "matches.xml",
+    "arenadetails": "arenadetails.xml",
+    "worlddetails": "worlddetails.xml",
 }
 
 ENTRY_DATA = {

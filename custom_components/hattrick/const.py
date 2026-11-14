@@ -37,7 +37,7 @@ FILE_VERSIONS: dict[str, str] = {
     "leaguedetails": "2.5",
     "matches": "3.0",
     "arenadetails": "1.5",
-    "world": "1.8",
+    "worlddetails": "1.2",
 }
 
 # File disponibili ma non nel ciclo standard (on-demand o opzionali)

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>trainingsummary</FileName>
+  <Version>1.5</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <Team>
+    <TeamID>7654321</TeamID>
+    <TeamName>Squadra di Test</TeamName>
+    <TrainingSummaryList>
+      <TrainingSummary>
+        <Season>75</Season>
+        <Week>45</Week>
+        <TrainingType>3</TrainingType>
+        <TrainingIntensity>90</TrainingIntensity>
+      </TrainingSummary>
+      <TrainingSummary>
+        <Season>75</Season>
+        <Week>46</Week>
+        <TrainingType>6</TrainingType>
+        <TrainingIntensity>100</TrainingIntensity>
+      </TrainingSummary>
+    </TrainingSummaryList>
+  </Team>
+</HattrickData>

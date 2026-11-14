@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>worlddetails</FileName>
+  <Version>1.2</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <World>
+    <Season>75</Season>
+    <CountryList>
+      <Country>
+        <CountryID>5</CountryID>
+        <CountryName>Italia</CountryName>
+        <CurrencyName>Euro</CurrencyName>
+        <CurrencyRate>10.5</CurrencyRate>
+        <LeagueList>
+          <League>
+            <LeagueID>12345</LeagueID>
+            <LeagueName>Serie Test</LeagueName>
+            <TrainingDate>2026-11-15 03:30:00</TrainingDate>
+            <EconomyDate>2026-11-15 03:45:00</EconomyDate>
+            <SeriesMatchDate>2026-11-14 19:30:00</SeriesMatchDate>
+            <CupMatchDate>2026-11-18 20:00:00</CupMatchDate>
+          </League>
+        </LeagueList>
+      </Country>
+    </CountryList>
+  </World>
+</HattrickData>
