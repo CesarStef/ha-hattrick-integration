@@ -50,3 +50,4 @@ def test_parsing_tollerante_campi_mancanti():
     assert team.team_id == 1
     assert team.team_name == ""
     assert team.coach_level == 0
+    assert team.fetched_date == datetime.min

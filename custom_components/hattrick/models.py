@@ -32,8 +32,14 @@ def _find_int(elem: ET.Element | None, path: str, default: int = 0) -> int:
 
 
 def parse_htt_datetime(value: str) -> datetime:
-    """Converte una data CHPP (HTT) in datetime naive."""
-    return datetime.strptime(value, HTT_FORMAT)
+    """Converte una data CHPP (HTT) in datetime naive.
+
+    Stringa vuota o malformata -> datetime.min (parsing tollerante).
+    """
+    try:
+        return datetime.strptime(value, HTT_FORMAT)
+    except ValueError:
+        return datetime.min
 
 
 @dataclass
