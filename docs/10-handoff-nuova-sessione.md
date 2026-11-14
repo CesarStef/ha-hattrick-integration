@@ -6,10 +6,10 @@ esattamente da dove ripartire. Aggiornarlo a ogni milestone.
 ## 1. Stato del repository
 
 - Branch `main`, remote `origin` = `https://github.com/CesarStef/ha-hattrick-integration.git`
-- Ultimo commit su main: `6c228e5` (pushato). Tag `v0.3.0` pushato.
-- **Milestone M3 completata**: servizi on-demand `get_match_details`/`get_player`
-  con risposta, sensor diagnostici ultima partita (matchdetails/matchlineup),
-  23 sensor totali, 59 test verdi, coverage 94%.
+- Ultimo commit su main: `bd6478a` (pushato). Tag `v0.4.0` pushato.
+- **Milestone M4 completata**: 4 servizi (`get_match_details`, `get_player`,
+  `set_match_orders` con POST matchorders.xml, `refresh`), sensor diagnostici
+  ultima partita, 23 sensor totali, 69 test verdi, coverage 94%.
 
 ```
 ha-hattrick-integration/
@@ -21,7 +21,7 @@ ha-hattrick-integration/
 │                                  #   pytest-homeassistant-custom-component, requests-oauthlib
 ├── .github/workflows/             # hassfest.yaml, hacs.yaml
 ├── custom_components/hattrick/
-│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.3.0
+│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.4.0
 │   ├── const.py                   # endpoint CHPP, CONF_*, FILE_VERSIONS, ON_DEMAND_FILES,
 │   │                              #   SELECTABLE_FILES, intervalli, matchday
 │   ├── api.py                     # HattrickCHPPClient (OAuth 1.0a) + HattrickApiError/AuthError
@@ -37,8 +37,10 @@ ha-hattrick-integration/
 │   │                              #   matchday)
 │   ├── entity.py                  # HattrickEntity + device_info squadra
 │   ├── sensor.py                  # 23 sensor (vedi docs/04 §1–§8 + diagnostici M3)
-│   ├── services.py                # servizi get_match_details / get_player (supports_response ONLY)
-│   ├── services.yaml              # schema servizi (match_id/player_id/config_entry)
+│   ├── services.py                # 4 servizi: get_match_details/get_player/set_match_orders
+│   │                              #   (supports_response ONLY) + refresh
+│   ├── services.yaml              # schema di tutti i servizi con selettori
+│   ├── icons.json                 # icone dei 4 servizi
 │   ├── __init__.py                # setup/unload entry + registrazione/rimozione servizi
 │   ├── strings.json
 │   └── translations/{en,it}.json
@@ -51,12 +53,15 @@ ha-hattrick-integration/
     ├── test_coordinator.py        # 6 test coordinator (incl. matchday)
     ├── test_config_flow.py        # 8 test config flow + options
     ├── test_sensor.py             # 11 test sensor/device (incl. diagnostici partita)
-    └── test_services.py           # 4 test servizi on-demand
+    ├── test_services.py           # 10 test servizi (on-demand, set_match_orders, refresh)
+    └── test_api.py                # 12 test client CHPP (incl. POST matchorders)
 ```
 
 Commit recenti:
 
 ```
+bd6478a T20: servizio refresh + icons.json + servizi in services.yaml/traduzioni
+0cddaad T19: set_match_orders (POST matchorders.xml) + refresh post-invio + test
 6c228e5 T18: sensor diagnostici dettaglio/tattica ultima partita (matchdetails/matchlineup)
 783da55 T16: servizi get_match_details/get_player con supports_response + services.yaml
 e0db589 Fix config flow: step app consumer key/secret + wrap TokenRequestDenied in HattrickAuthError
@@ -90,11 +95,11 @@ gira su HA 2025.1+ (vedi `hacs.json`); il target di pyproject è py313 (HA 2026)
 
 ```bash
 /tmp/ht-venv/bin/ruff check . && /tmp/ht-venv/bin/ruff format .
-/tmp/ht-venv/bin/pytest -q                                        # 59 test
+/tmp/ht-venv/bin/pytest -q                                        # 69 test
 /tmp/ht-venv/bin/pytest -q --cov=custom_components/hattrick --cov-report=term-missing
 ```
 
-Baseline attesa: **59 passed**, coverage ~94%.
+Baseline attesa: **69 passed**, coverage ~94%.
 
 ## 4. Cosa è già implementato (mappa rápida)
 
@@ -123,9 +128,17 @@ Baseline attesa: **59 passed**, coverage ~94%.
   (`identifiers={(DOMAIN, str(team_id))}`); i diagnostici hanno
   `entity_category=DIAGNOSTIC`. I timestamp (`prossima_partita`, `server_time`)
   usano `device_class=TIMESTAMP` e datetime aware HTT.
-- `services.py`: `hattrick.get_match_details` e `hattrick.get_player` con
-  `supports_response=SupportsResponse.ONLY`, registrados una sola volta in
-  `hass.data[DOMAIN]["services_registered"]` e rimossi quando non restano entry.
+- `services.py`: 4 servizi registrati una sola volta in
+  `hass.data[DOMAIN]["services_registered"]` e rimossi quando non restano entry:
+  `get_match_details`/`get_player`/`set_match_orders` con
+  `supports_response=SupportsResponse.ONLY`, e `refresh` (senza risposta).
+  `set_match_orders` costruisce il corpo XML di `matchorders.xml`
+  (`_build_match_orders_xml`), lo posta con `async_post_file` e poi chiama
+  `coordinator.async_request_refresh()`; i nomi campo XML sono quelli della
+  wiki CHPP, **da riconfermare** contro dati reali.
+- `api.py`: `post_file_sync`/`async_post_file` per POST XML su `chppxml.ashx`;
+  `_parse_response` condiviso GET/POST (401/403 → AuthError, 429/altro →
+  ApiError, `<Error>` XML).
 - Compatibilità HA: l'options flow usa `OptionsFlow` semplice con `config_entry`
   auto-assegnato da HA (2024.11+): funziona su 2025.1 e su 2026.11 (dove
   `OptionsFlowWithConfigEntry` è in phase-out e il setter rimosso dal 2025.12).
@@ -141,17 +154,16 @@ Baseline attesa: **59 passed**, coverage ~94%.
 
 ## 5. Cosa resta da fare (prossimi passi, in ordine)
 
-1. **T19 (M4)**: servizio `hattrick.set_match_orders` (POST `matchorders.xml`,
-   richiede permesso scrittura sull'app CHPP): schema voluptuous + selettori in
-   `services.yaml`, client `async_post_file` in `api.py`, refresh post-invio,
-   risposta con esito; test con mock POST (payload XML corretto).
-2. **T20 (M4)**: servizio `hattrick.refresh` + icone servizi (`icons.json`) +
-   traduzioni servizi in strings/it/en; verifica hassfest su `services.yaml`.
-3. **M5 (T21–T22)**: dashboard Lovelace di esempio + automazioni + README utente.
-4. **M6–M8**: test suite completa (coverage > 80%), diagnostics redatta,
-   release v1.0.0, certificazione CHPP (testo pronto in `docs/11`, ma
-   **ricontrollare la policy CHPP sull'AI**: a maggio 2026 Hattrick ha rifiutato
-   un'app generata da AI) — vedi `docs/09-piano-di-lavoro.md`.
+1. **T21 (M5)**: dashboard Lovelace di esempio (`examples/dashboard.yaml`) +
+   automazioni di esempio (`examples/automations.yaml`), importabili in HA di
+   test senza errori.
+2. **T22 (M5)**: README utente completo: installazione (Marketplace/HACS),
+   configurazione, FAQ.
+3. **M6 (T23–T24)**: test suite completa (coverage > 80%), `diagnostics.py`
+   redatta senza token + test automatico che il dump non contenga credenziali.
+4. **M7–M8**: release v1.0.0, certificazione CHPP (testo pronto in `docs/11`,
+   ma **ricontrollare la policy CHPP sull'AI**: a maggio 2026 Hattrick ha
+   rifiutato un'app generata da AI) — vedi `docs/09-piano-di-lavoro.md`.
 
 ## 6. Attenzioni e note tecniche
 
@@ -178,6 +190,6 @@ Baseline attesa: **59 passed**, coverage ~94%.
 
 ## 8. Come riprendere
 
-Chiedere: *"procedi con T19"* (o l'ultimo task in sospeso). Ricostruire il venv
-(sezione 2), lanciare `pytest -q` per confermare la baseline 59 passed, poi
+Chiedere: *"procedi con T21"* (o l'ultimo task in sospeso). Ricostruire il venv
+(sezione 2), lanciare `pytest -q` per confermare la baseline 69 passed, poi
 lavorare al task e committare.
