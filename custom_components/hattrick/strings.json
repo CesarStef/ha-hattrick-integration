@@ -61,5 +61,13 @@
         "manual": "Manuale (credenziali CHPP)"
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "team_name": { "name": "Nome squadra" },
+      "morale": { "name": "Morale" },
+      "fiducia_tifosi": { "name": "Fiducia tifosi" },
+      "cassa": { "name": "Cassa" }
+    }
   }
 }

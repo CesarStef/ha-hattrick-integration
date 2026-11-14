@@ -61,5 +61,13 @@
         "manual": "Manual (CHPP credentials)"
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "team_name": { "name": "Team name" },
+      "morale": { "name": "Morale" },
+      "fiducia_tifosi": { "name": "Fan confidence" },
+      "cassa": { "name": "Cash" }
+    }
   }
 }
