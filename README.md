@@ -26,9 +26,26 @@ automazioni.
 
 ## Stato del progetto
 
-Fase di documentazione e progettazione. Il codice dell'integrazione verrà sviluppato in
-`custom_components/hattrick/` seguendo l'architettura descritta in
-[docs/03-architettura-integrazione.md](docs/03-architettura-integrazione.md).
+Milestone M1 e M2 completate (release `v0.2.0`): config flow OAuth, coordinator multi-file,
+21 sensor. Prossime milestone: servizi on-demand (M3), azioni (M4), release pubblica (M5–M8).
+Vedi [docs/09-piano-di-lavoro.md](docs/09-piano-di-lavoro.md).
+
+## Disclaimer
+
+Questo progetto è **vibe-codato**: è stato generato e mantenuto con un agente di coding AI
+([Mistral Vibe](https://mistral.ai)), non è stato revisionato riga per riga da un essere
+umano. Il codice è coperto da test automatici (47 test) e segue le linee guida di HA, ma
+**usalo a tuo rischio**: prima di affidargli automazioni importanti (es. ordini di partita
+in matchday) verifica i dati reali nella tua istanza.
+
+In particolare:
+
+- l'app CHPP di riferimento **non è ancora certificata** da Hattrick (milestone M8), quindi
+  solo il proprietario dell'app può autorizzarla;
+- i nomi dei campi XML delle API CHPP sono basati sulla documentazione pubblica e possono
+  differire dalle risposte reali: il primo avvio con un account reale è il collaudo vero;
+- la logica di sicurezza (mai loggare token, mai salvare password, rispetto dei limiti di
+  download CHPP) è implementata ma va ricontrollata prima di un uso in produzione.
 
 ## Licenza
 
