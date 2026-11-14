@@ -33,9 +33,7 @@ def test_dashboard_riferimenti_sensor_esistono():
     sensor_keys = set(translations["entity"]["sensor"].keys())
     raw = (EXAMPLES_DIR / "dashboard.yaml").read_text(encoding="utf-8")
     # ignora i commenti: possono contenere entity_id di esempio con suffisso numerico
-    text = "\n".join(
-        line for line in raw.splitlines() if not line.lstrip().startswith("#")
-    )
+    text = "\n".join(line for line in raw.splitlines() if not line.lstrip().startswith("#"))
     for match in re.findall(r"sensor\.([a-z0-9_]+)", text):
         # gli entity_id derivano dai nomi tradotti: ricostruisci lo slug dal nome
         found = any(

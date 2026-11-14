@@ -11,7 +11,7 @@ from homeassistant.config_entries import SOURCE_REAUTH, SOURCE_USER
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.hattrick.api import HattrickAuthError
+from custom_components.hattrick.api import HattrickApiError, HattrickAuthError
 from custom_components.hattrick.const import (
     CONF_ACCESS_TOKEN,
     CONF_ACCESS_TOKEN_SECRET,
@@ -178,3 +178,83 @@ async def test_options_flow(hass, mock_client):
     assert result["data"]["scan_interval"] == 30
     assert result["data"]["enabled_files"] == ["teamdetails", "economy"]
     assert result["data"]["matchday"] is True
+
+
+async def test_app_step_empty_credentials_shows_error(hass, mock_client):
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"mode": "auto"})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_CONSUMER_KEY: "   ", CONF_CONSUMER_SECRET: ""}
+    )
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "app"
+    assert result["errors"]["base"] == "invalid_auth"
+
+
+async def test_manual_flow_cannot_connect(hass):
+    class NoConnClient(FakeCHPPClient):
+        async def async_get_file(self, hass, file, **params):
+            raise HattrickApiError("HTTP 500")
+
+    with mock.patch("custom_components.hattrick.config_flow.HattrickCHPPClient", NoConnClient):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"mode": "manual"}
+        )
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], MANUAL_DATA)
+        assert result["type"] == FlowResultType.FORM
+        assert result["errors"]["base"] == "cannot_connect"
+
+
+async def test_auto_flow_request_token_api_error_shows_cannot_connect(hass):
+    class NoConnClient(FakeCHPPClient):
+        def get_request_token_sync(self, callback_url: str = "oob"):
+            raise HattrickApiError("rete non raggiungibile")
+
+    with mock.patch("custom_components.hattrick.config_flow.HattrickCHPPClient", NoConnClient):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {"mode": "auto"})
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_CONSUMER_KEY: "ck", CONF_CONSUMER_SECRET: "cs"}
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "auth"
+        assert result["errors"]["base"] == "cannot_connect"
+
+
+async def test_auto_flow_team_validation_invalid_auth(hass):
+    class BadTeamClient(FakeCHPPClient):
+        async def async_get_file(self, hass, file, **params):
+            raise HattrickAuthError("token non valido")
+
+    with mock.patch("custom_components.hattrick.config_flow.HattrickCHPPClient", BadTeamClient):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {"mode": "auto"})
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_CONSUMER_KEY: "ck", CONF_CONSUMER_SECRET: "cs"}
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"verifier": "good"}
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["errors"]["base"] == "invalid_auth"
+
+
+async def test_reauth_cannot_connect(hass):
+    class NoConnClient(FakeCHPPClient):
+        def get_access_token_sync(self, request_token, request_token_secret, verifier):
+            raise HattrickApiError("HTTP 500")
+
+    entry = MockConfigEntry(domain=DOMAIN, unique_id="1234567", data=MANUAL_DATA)
+    entry.add_to_hass(hass)
+    with mock.patch("custom_components.hattrick.config_flow.HattrickCHPPClient", NoConnClient):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_REAUTH, "entry_id": entry.entry_id},
+            data=entry.data,
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"verifier": "good"}
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["errors"]["base"] == "cannot_connect"

@@ -38,6 +38,8 @@ ALL_FILES = {
     "matches": "matches.xml",
     "arenadetails": "arenadetails.xml",
     "worlddetails": "worlddetails.xml",
+    "matchdetails": "matchdetails.xml",
+    "matchlineup": "matchlineup.xml",
 }
 
 
@@ -187,3 +189,55 @@ async def test_coordinator_api_error_raises_update_failed(hass):
     )
     with pytest.raises(UpdateFailed):
         await coordinator._async_update_data()
+
+
+class _FailOnFileClient(MockCHPPClient):
+    """Client che fallisce solo su alcuni file (per i test on-demand)."""
+
+    def __init__(self, fail_file: str, error: Exception) -> None:
+        super().__init__()
+        self._fail_file = fail_file
+        self._fail_error = error
+
+    async def async_get_file(self, hass, file: str, **params):
+        if file == self._fail_file:
+            raise self._fail_error
+        return await super().async_get_file(hass, file, **params)
+
+
+async def test_coordinator_on_demand_auth_error_raises_config_entry_auth_failed(hass):
+    entry = _entry()
+    entry.add_to_hass(hass)
+    coordinator = HattrickDataUpdateCoordinator(
+        hass,
+        entry,
+        _FailOnFileClient("matchdetails", HattrickAuthError("token revocato")),
+        enabled_files=[*ALL_FILES.keys(), "matchdetails", "matchlineup"],
+    )
+    with pytest.raises(ConfigEntryAuthFailed):
+        await coordinator._async_update_data()
+
+
+async def test_coordinator_on_demand_api_error_raises_update_failed(hass):
+    entry = _entry()
+    entry.add_to_hass(hass)
+    coordinator = HattrickDataUpdateCoordinator(
+        hass,
+        entry,
+        _FailOnFileClient("matchlineup", HattrickApiError("HTTP 500")),
+        enabled_files=[*ALL_FILES.keys(), "matchdetails", "matchlineup"],
+    )
+    with pytest.raises(UpdateFailed):
+        await coordinator._async_update_data()
+
+
+async def test_coordinator_matchday_no_next_match_keeps_interval(hass):
+    entry = _entry()
+    entry.add_to_hass(hass)
+    coordinator = HattrickDataUpdateCoordinator(
+        hass, entry, MockCHPPClient(), update_interval=timedelta(minutes=15), matchday=True
+    )
+    data = _data_with_next_match(datetime.now(HTT_TIMEZONE) + timedelta(hours=1))
+    data.matches = None
+    coordinator._apply_matchday_interval(data)
+    assert coordinator.update_interval == timedelta(minutes=15)

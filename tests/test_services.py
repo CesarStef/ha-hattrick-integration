@@ -51,9 +51,13 @@ class MockCHPPClient:
         self.calls: list[tuple[str, dict]] = []
         self.posts: list[tuple[str, str]] = []
         self.post_error: Exception | None = None
+        self.fail_files: set[str] = set()
+        self.fail_error: Exception = HattrickApiError("errore CHPP")
 
     async def async_get_file(self, hass, file: str, **params):
         self.calls.append((file, params))
+        if file in self.fail_files:
+            raise self.fail_error
         return ET.fromstring((FIXTURES_DIR / FILES[file]).read_text(encoding="utf-8"))
 
     async def async_post_file(self, hass, file: str, body: str, **params):
@@ -226,3 +230,63 @@ async def test_refresh_unknown_config_entry_raises(hass: HomeAssistant):
         await hass.services.async_call(
             DOMAIN, "refresh", {"config_entry": "inesistente"}, blocking=True
         )
+
+
+async def test_service_without_entries_raises(hass: HomeAssistant):
+    from custom_components.hattrick.services import async_setup_services
+
+    await async_setup_services(hass)
+    with pytest.raises(ServiceValidationError, match="Nessuna squadra"):
+        await hass.services.async_call(
+            DOMAIN, "get_player", {"player_id": 1}, blocking=True, return_response=True
+        )
+
+
+async def test_get_match_details_api_error_raises(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator.client.fail_files.add("matchdetails")
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(
+            DOMAIN, "get_match_details", {"match_id": 9001}, blocking=True, return_response=True
+        )
+
+
+async def test_get_player_api_error_raises(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator.client.fail_files.add("players")
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(
+            DOMAIN, "get_player", {"player_id": 1002}, blocking=True, return_response=True
+        )
+
+
+async def test_set_match_orders_auth_error_raises(hass: HomeAssistant):
+    entry = await _setup_entry(hass)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    from custom_components.hattrick.api import HattrickAuthError
+
+    coordinator.client.post_error = HattrickAuthError("token revocato")
+    with pytest.raises(HomeAssistantError, match="Autorizzazione"):
+        await hass.services.async_call(
+            DOMAIN, "set_match_orders", {"match_id": 9002}, blocking=True, return_response=True
+        )
+
+
+async def test_services_kept_while_another_entry_remains(hass: HomeAssistant):
+    entry1 = await _setup_entry(hass)
+    entry2 = MockConfigEntry(domain=DOMAIN, unique_id="7654321", data=ENTRY_DATA)
+    entry2.add_to_hass(hass)
+    with mock.patch("custom_components.hattrick.HattrickCHPPClient", MockCHPPClient):
+        await hass.config_entries.async_setup(entry2.entry_id)
+        await hass.async_block_till_done()
+    assert hass.services.has_service(DOMAIN, "get_match_details")
+    await hass.config_entries.async_unload(entry1.entry_id)
+    await hass.async_block_till_done()
+    # resta la entry2: i servizi non devono essere rimossi
+    assert hass.services.has_service(DOMAIN, "get_match_details")
+    assert hass.services.has_service(DOMAIN, "refresh")
+    await hass.config_entries.async_unload(entry2.entry_id)
+    await hass.async_block_till_done()
+    assert not hass.services.has_service(DOMAIN, "get_match_details")
