@@ -231,5 +231,11 @@
         }
       }
     }
+  },
+  "issues": {
+    "token_revocato": {
+      "title": "Token Hattrick revocato per {team}",
+      "description": "Hattrick ha rifiutato l'access token (revocato o scaduto). Tocca \"Correggi\" per ri-autorizzare l'app CHPP: verrai reindirizzato al login di Hattrick."
+    }
   }
 }

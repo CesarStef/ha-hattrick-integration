@@ -231,5 +231,11 @@
         }
       }
     }
+  },
+  "issues": {
+    "token_revocato": {
+      "title": "Hattrick token revoked for {team}",
+      "description": "Hattrick rejected the access token (revoked or expired). Click \"Fix\" to re-authorize the CHPP app: you will be redirected to the Hattrick login."
+    }
   }
 }

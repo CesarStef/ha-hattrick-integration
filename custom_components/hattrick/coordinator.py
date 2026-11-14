@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import HattrickApiError, HattrickAuthError, HattrickCHPPClient
@@ -82,6 +83,29 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
         self.base_interval = update_interval
         self.matchday = matchday
 
+    def _auth_issue_id(self) -> str:
+        """ID dell'issue (repair) per il token revocato di questa entry."""
+        return f"token_revocato_{self.config_entry.entry_id}"
+
+    def _create_auth_issue(self) -> None:
+        """Crea un repair fixable: l'utente puo ri-autorizzare l'app da HA."""
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            self._auth_issue_id(),
+            is_fixable=True,
+            is_persistent=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key="token_revocato",
+            issue_domain=DOMAIN,
+            data={"entry_id": self.config_entry.entry_id},
+            translation_placeholders={"team": self.config_entry.title},
+        )
+
+    def _delete_auth_issue(self) -> None:
+        """Rimuove il repair quando l'aggiornamento torna a funzionare."""
+        ir.async_delete_issue(self.hass, DOMAIN, self._auth_issue_id())
+
     async def _async_update_data(self) -> HattrickData:
         """Scarica i file abilitati in parallelo e costruisce il modello dati."""
         files = [
@@ -94,6 +118,7 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
                 *(self.client.async_get_file(self.hass, file) for file in files)
             )
         except HattrickAuthError as err:
+            self._create_auth_issue()
             raise ConfigEntryAuthFailed(
                 translation_domain=DOMAIN, translation_key="auth_error"
             ) from err
@@ -121,6 +146,7 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
         )
         await self._async_fetch_on_demand(data)
         self._apply_matchday_interval(data)
+        self._delete_auth_issue()
         return data
 
     async def _async_fetch_on_demand(self, data: HattrickData) -> None:
@@ -140,6 +166,7 @@ class HattrickDataUpdateCoordinator(DataUpdateCoordinator[HattrickData]):
                 )
                 data.match_lineup = MatchLineup.from_xml(root, data.team.team_id)
         except HattrickAuthError as err:
+            self._create_auth_issue()
             raise ConfigEntryAuthFailed(
                 translation_domain=DOMAIN, translation_key="auth_error"
             ) from err
