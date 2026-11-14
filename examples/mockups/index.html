@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock dashboard — Hattrick (dati finti)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<style>
+  :root {
+    --bg: #111418;
+    --card: #1c1f24;
+    --card2: #23272e;
+    --text: #e1e1e1;
+    --muted: #9aa0a6;
+    --accent: #03a9f4;
+    --good: #4caf50;
+    --warn: #ff9800;
+    --bad: #f44336;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: Roboto, -apple-system, "Segoe UI", sans-serif; font-size: 14px;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--card); padding: 12px 20px; position: sticky; top: 0; z-index: 10;
+    border-bottom: 1px solid #000;
+  }
+  .topbar h1 { font-size: 18px; font-weight: 500; margin: 0; }
+  .tabs { display: flex; gap: 4px; margin-left: auto; }
+  .tabs button {
+    background: transparent; color: var(--muted); border: none; padding: 8px 14px;
+    border-radius: 8px; cursor: pointer; font-size: 14px;
+  }
+  .tabs button.active { background: var(--card2); color: var(--text); }
+  .banner {
+    background: #3a2f14; color: #ffd54f; padding: 8px 20px; font-size: 12px;
+  }
+  main { padding: 20px; max-width: 1100px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .grid {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+  .card {
+    background: var(--card); border-radius: 12px; padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+  .card h2 {
+    font-size: 14px; font-weight: 500; color: var(--muted); margin: 0 0 12px;
+    text-transform: none;
+  }
+  .row {
+    display: flex; align-items: center; gap: 12px; padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .row:last-child { border-bottom: none; }
+  .row .mdi { font-size: 22px; color: var(--muted); width: 26px; text-align: center; }
+  .row .label { flex: 1; }
+  .row .value { font-weight: 500; }
+  .row .entity { display: block; font-size: 10px; color: var(--muted); font-family: monospace; }
+  .glance { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .tile {
+    background: var(--card); border-radius: 12px; padding: 14px; text-align: center;
+  }
+  .tile .mdi { font-size: 28px; color: var(--accent); }
+  .tile .v { font-size: 20px; font-weight: 500; margin-top: 6px; }
+  .tile .l { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tile .entity { font-size: 9px; color: #555; font-family: monospace; margin-top: 4px; }
+  .big {
+    background: linear-gradient(135deg, #0d47a1, #03a9f4); border-radius: 12px;
+    padding: 24px; text-align: center; color: #fff; margin-bottom: 12px;
+  }
+  .big .vs { font-size: 26px; font-weight: 700; margin: 8px 0; }
+  .big .when { font-size: 15px; opacity: .9; }
+  .big .count { font-size: 34px; font-weight: 700; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  .badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge.good { background: rgba(76,175,80,.2); color: var(--good); }
+  .badge.warn { background: rgba(255,152,0,.2); color: var(--warn); }
+  .badge.bad { background: rgba(244,67,54,.2); color: var(--bad); }
+  .badge.info { background: rgba(3,169,244,.2); color: var(--accent); }
+  .bar { height: 8px; border-radius: 4px; background: var(--card2); overflow: hidden; margin-top: 6px; }
+  .bar > div { height: 100%; background: var(--accent); }
+  .ratings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+  .ratings .r { background: var(--card2); border-radius: 8px; padding: 8px; text-align: center; }
+  .ratings .r .n { font-size: 18px; font-weight: 700; }
+  .ratings .r .t { font-size: 10px; color: var(--muted); }
+  .btn {
+    display: inline-block; background: var(--accent); color: #fff; border: none;
+    padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 12px;
+  }
+  .btn.ghost { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <i class="mdi mdi-shield" style="font-size:24px;color:var(--accent)"></i>
+  <h1>Hattrick — Squadra di Test</h1>
+  <div class="tabs">
+    <button class="active" data-view="panoramica">Panoramica</button>
+    <button data-view="matchday">Matchday</button>
+    <button data-view="compatta">Compatta</button>
+  </div>
+</div>
+<div class="banner">Mock con dati finti (basati sulle fixture di test) — serve solo a valutare il layout, non è una dashboard reale di HA.</div>
+
+<main>
+
+  <!-- ============ VISTA 1: PANORAMICA (come examples/dashboard.yaml) ============ -->
+  <section id="panoramica" class="view active">
+    <div class="grid">
+      <div class="card">
+        <h2>Panoramica</h2>
+        <div class="row"><i class="mdi mdi-shield"></i><span class="label">Nome squadra<span class="entity">sensor.nome_squadra</span></span><span class="value">Squadra di Test</span></div>
+        <div class="row"><i class="mdi mdi-podium"></i><span class="label">Posizione in classifica<span class="entity">sensor.posizione_in_classifica</span></span><span class="value">3ª su 8</span></div>
+        <div class="row"><i class="mdi mdi-cash"></i><span class="label">Cassa<span class="entity">sensor.cassa</span></span><span class="value">5.000.000 €</span></div>
+        <div class="row"><i class="mdi mdi-cash-plus"></i><span class="label">Entrate previste<span class="entity">sensor.entrate_previste</span></span><span class="value">4.800.000 €</span></div>
+        <div class="row"><i class="mdi mdi-emoticon"></i><span class="label">Morale<span class="entity">sensor.morale</span></span><span class="value">excellent <span class="badge good">OTTIMO</span></span></div>
+        <div class="row"><i class="mdi mdi-account-group"></i><span class="label">Fiducia tifosi<span class="entity">sensor.fiducia_tifosi</span></span><span class="value">wonderful</span></div>
+        <div class="row"><i class="mdi mdi-whistle"></i><span class="label">Allenatore<span class="entity">sensor.allenatore</span></span><span class="value">Allenatore Test (liv. 5)</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Rosa</h2>
+        <div class="row"><i class="mdi mdi-account-multiple"></i><span class="label">Giocatori<span class="entity">sensor.giocatori</span></span><span class="value">3</span></div>
+        <div class="row"><i class="mdi mdi-chart-line"></i><span class="label">TSI totale<span class="entity">sensor.tsi_totale</span></span><span class="value">185.000</span></div>
+        <div class="row"><i class="mdi mdi-heart-pulse"></i><span class="label">Forma squadra<span class="entity">sensor.forma_squadra</span></span><span class="value">6.0</span></div>
+        <div class="row"><i class="mdi mdi-bandage"></i><span class="label">Infortunati<span class="entity">sensor.infortunati</span></span><span class="value">1 <span class="badge warn">Luca Il Muro Bianchi (2 sett.)</span></span></div>
+        <div class="row"><i class="mdi mdi-card-remove"></i><span class="label">Squalificati<span class="entity">sensor.squalificati</span></span><span class="value">1 <span class="badge bad">Paolo Verdi (3 cartellini)</span></span></div>
+      </div>
+
+      <div class="card">
+        <h2>Prossima partita</h2>
+        <div class="row"><i class="mdi mdi-calendar-clock"></i><span class="label">Prossima partita<span class="entity">sensor.prossima_partita</span></span><span class="value">14/11/2026 19:30</span></div>
+        <div class="row"><i class="mdi mdi-account"></i><span class="label">Avversario<span class="entity">attr: avversario</span></span><span class="value">Altra Squadra (trasferta, lega)</span></div>
+        <div class="row"><i class="mdi mdi-scoreboard"></i><span class="label">Ultima partita<span class="entity">sensor.ultima_partita</span></span><span class="value">3-1 vs Avversari FC (casa)</span></div>
+        <div class="row"><i class="mdi mdi-calendar-multiple"></i><span class="label">Partite programmate<span class="entity">sensor.partite_programmate</span></span><span class="value">2</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Allenamento e stadio</h2>
+        <div class="row"><i class="mdi mdi-dumbbell"></i><span class="label">Allenamento<span class="entity">sensor.allenamento</span></span><span class="value">gioco (intensità 100, stamina 10%)</span></div>
+        <div class="row"><i class="mdi mdi-chart-timeline-variant"></i><span class="label">Progresso allenamento<span class="entity">sensor.progresso_allenamento</span></span><span class="value">gioco</span></div>
+        <div class="row"><i class="mdi mdi-stadium"></i><span class="label">Stadio<span class="entity">sensor.stadio</span></span><span class="value">Stadio di Test — 50.000 posti</span></div>
+        <div class="row"><i class="mdi mdi-clock-outline"></i><span class="label">Orario server HT<span class="entity">sensor.orario_server_ht</span></span><span class="value">14/11/2026 10:30</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Club</h2>
+        <div class="row"><i class="mdi mdi-account-heart"></i><span class="label">Fan club<span class="entity">sensor.fan_club</span></span><span class="value">1.500 (Fan Club di Test)</span></div>
+        <div class="row"><i class="mdi mdi-school"></i><span class="label">Settore giovanile<span class="entity">sensor.settore_giovanile</span></span><span class="value">livello 5</span></div>
+        <div class="row"><i class="mdi mdi-briefcase"></i><span class="label">Staff<span class="entity">sensor.staff</span></span><span class="value">3 membri</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Cassa (ultime 24h)</h2>
+        <svg viewBox="0 0 300 80" width="100%" height="80">
+          <polyline points="0,55 40,50 80,52 120,40 160,44 200,30 240,34 300,20"
+            fill="none" stroke="#03a9f4" stroke-width="2.5"/>
+          <polyline points="0,55 40,50 80,52 120,40 160,44 200,30 240,34 300,20 300,80 0,80"
+            fill="rgba(3,169,244,.15)" stroke="none"/>
+        </svg>
+        <div style="color:var(--muted);font-size:11px;margin-top:6px">sensor.cassa — history-graph</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VISTA 2: MATCHDAY ============ -->
+  <section id="matchday" class="view">
+    <div class="big">
+      <div style="font-size:13px;opacity:.85">PROSSIMA PARTITA — SERIE TEST, GIORNATA 6</div>
+      <div class="vs">Altra Squadra <span style="opacity:.6;font-size:18px">in trasferta</span></div>
+      <div class="when">Oggi 19:30 HT · Stadio loro · match_id 9002</div>
+      <div class="count" id="countdown">--:--:--</div>
+      <button class="btn">Invia ordini (hattrick.set_match_orders)</button>
+      <button class="btn ghost">Dettagli partita (get_match_details)</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Ultima partita — 3-1 vs Avversari FC (casa)</h2>
+        <div class="row"><i class="mdi mdi-chart-box"></i><span class="label">Rating totale casa<span class="entity">sensor.dettaglio_ultima_partita</span></span><span class="value">32</span></div>
+        <div class="ratings">
+          <div class="r"><div class="n">8</div><div class="t">POR</div></div>
+          <div class="r"><div class="n">7</div><div class="t">DIF</div></div>
+          <div class="r"><div class="n">9</div><div class="t">CC</div></div>
+          <div class="r"><div class="n">8</div><div class="t">ATT</div></div>
+        </div>
+        <div class="row" style="margin-top:10px"><span class="label">Possesso casa / tiri</span><span class="value">55% · 12 (avv. 6)</span></div>
+        <div class="row"><span class="label">Meteo / spettatori</span><span class="value">Sunny · 48.000</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Tattica usata</h2>
+        <div class="row"><i class="mdi mdi-strategy"></i><span class="label">Tattica<span class="entity">sensor.tattica_ultima_partita</span></span><span class="value">pressing <span class="badge info">4-3-3</span></span></div>
+        <div class="row"><span class="label">Livello tattica</span><span class="value">5</span></div>
+        <div class="bar"><div style="width:25%"></div></div>
+        <div class="row" style="margin-top:10px"><span class="label">Forma squadra</span><span class="value">6.0</span></div>
+        <div class="bar"><div style="width:60%;background:var(--good)"></div></div>
+      </div>
+
+      <div class="card">
+        <h2>Rosa — stato</h2>
+        <table>
+          <tr><th>Giocatore</th><th>Ruolo</th><th>Forma</th><th>TSI</th><th></th></tr>
+          <tr><td>Mario Rossi</td><td>POR</td><td>6</td><td>80.000</td><td></td></tr>
+          <tr><td>Luca Il Muro Bianchi</td><td>DIF</td><td>5</td><td>60.000</td><td><span class="badge warn">infortunio 2 sett.</span></td></tr>
+          <tr><td>Paolo Verdi</td><td>ATT</td><td>7</td><td>45.000</td><td><span class="badge bad">squalificato</span></td></tr>
+        </table>
+        <div style="color:var(--muted);font-size:11px;margin-top:6px">sensor.giocatori — attributo "giocatori"</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VISTA 3: COMPATTA (glance) ============ -->
+  <section id="compatta" class="view">
+    <div class="glance">
+      <div class="tile"><i class="mdi mdi-shield"></i><div class="v">Squadra di Test</div><div class="l">3ª in Serie Test</div><div class="entity">sensor.nome_squadra</div></div>
+      <div class="tile"><i class="mdi mdi-cash"></i><div class="v">5.000.000 €</div><div class="l">cassa</div><div class="entity">sensor.cassa</div></div>
+      <div class="tile"><i class="mdi mdi-emoticon"></i><div class="v">excellent</div><div class="l">morale</div><div class="entity">sensor.morale</div></div>
+      <div class="tile"><i class="mdi mdi-account-group"></i><div class="v">wonderful</div><div class="l">fiducia tifosi</div><div class="entity">sensor.fiducia_tifosi</div></div>
+      <div class="tile"><i class="mdi mdi-account-multiple"></i><div class="v">3</div><div class="l">giocatori · TSI 185.000</div><div class="entity">sensor.giocatori</div></div>
+      <div class="tile"><i class="mdi mdi-heart-pulse"></i><div class="v">6.0</div><div class="l">forma squadra</div><div class="entity">sensor.forma_squadra</div></div>
+      <div class="tile"><i class="mdi mdi-bandage"></i><div class="v">1</div><div class="l">infortunati</div><div class="entity">sensor.infortunati</div></div>
+      <div class="tile"><i class="mdi mdi-card-remove"></i><div class="v">1</div><div class="l">squalificati</div><div class="entity">sensor.squalificati</div></div>
+      <div class="tile"><i class="mdi mdi-calendar-clock"></i><div class="v">19:30</div><div class="l">vs Altra Squadra (T)</div><div class="entity">sensor.prossima_partita</div></div>
+      <div class="tile"><i class="mdi mdi-scoreboard"></i><div class="v">3-1</div><div class="l">ultima partita</div><div class="entity">sensor.ultima_partita</div></div>
+      <div class="tile"><i class="mdi mdi-dumbbell"></i><div class="v">gioco</div><div class="l">allenamento</div><div class="entity">sensor.allenamento</div></div>
+      <div class="tile"><i class="mdi mdi-stadium"></i><div class="v">50.000</div><div class="l">posti stadio</div><div class="entity">sensor.stadio</div></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // switch viste
+  document.querySelectorAll('.tabs button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.tabs button').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+      document.getElementById(btn.dataset.view).classList.add('active');
+    });
+  });
+  // countdown finto verso le 19:30 di oggi (solo demo)
+  function tick() {
+    var now = new Date();
+    var target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19, 30, 0);
+    if (target < now) target.setDate(target.getDate() + 1);
+    var diff = Math.floor((target - now) / 1000);
+    var h = String(Math.floor(diff / 3600)).padStart(2, '0');
+    var m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+    var s = String(diff % 60).padStart(2, '0');
+    var el = document.getElementById('countdown');
+    if (el) el.textContent = h + ':' + m + ':' + s;
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+
+</body>
+</html>
