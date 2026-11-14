@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>teamdetails</FileName>
+  <Version>3.6</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <Team>
+    <TeamID>7654321</TeamID>
+    <TeamName>Squadra di Test</TeamName>
+    <ShortTeamName>SDT</ShortTeamName>
+    <Arena>
+      <ArenaID>7654322</ArenaID>
+      <ArenaName>Stadio di Test</ArenaName>
+    </Arena>
+    <League>
+      <LeagueID>12345</LeagueID>
+      <LeagueName>Serie Test</LeagueName>
+    </League>
+    <Region>
+      <RegionID>678</RegionID>
+      <RegionName>Regione Test</RegionName>
+    </Region>
+    <Trainer>
+      <PlayerID>111222</PlayerID>
+      <Name>Allenatore Test</Name>
+      <CoachLevel>5</CoachLevel>
+    </Trainer>
+  </Team>
+  <User>
+    <LoginName>manager_test</LoginName>
+    <SupporterTier>none</SupporterTier>
+  </User>
+</HattrickData>

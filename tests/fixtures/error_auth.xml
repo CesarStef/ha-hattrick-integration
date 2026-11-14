@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>teamdetails</FileName>
+  <Version>3.6</Version>
+  <UserID>0</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <Error>Invalid oauth_token: the token has been revoked</Error>
+</HattrickData>
