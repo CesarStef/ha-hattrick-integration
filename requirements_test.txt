@@ -1,0 +1,7 @@
+# Dipendenze per sviluppo e test (non richiesto da hassfest)
+ruff>=0.9
+pytest>=8.2
+pytest-asyncio>=0.25
+pytest-homeassistant-custom-component>=0.13.230
+requests-oauthlib>=2.0.0
+voluptuous>=0.15

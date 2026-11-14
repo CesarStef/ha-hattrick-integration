@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Test e tool
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Ambiente locale
+.env
+*.log
+.DS_Store
+
+# Home Assistant (config di test locale)
+/homeassistant/
+/config/
+*.db
