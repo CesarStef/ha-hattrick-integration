@@ -6,10 +6,9 @@ esattamente da dove ripartire. Aggiornarlo a ogni milestone.
 ## 1. Stato del repository
 
 - Branch `main`, remote `origin` = `https://github.com/CesarStef/ha-hattrick-integration.git`
-- Ultimo commit su main: `bd6478a` (pushato). Tag `v0.4.0` pushato.
-- **Milestone M4 completata**: 4 servizi (`get_match_details`, `get_player`,
-  `set_match_orders` con POST matchorders.xml, `refresh`), sensor diagnostici
-  ultima partita, 23 sensor totali, 69 test verdi, coverage 94%.
+- Ultimo commit su main: `bdb7561`. Tag `v0.5.0` pushato.
+- **Milestone M5 completata**: 4 servizi, 23 sensor, esempi dashboard/automazioni
+  (`examples/`), README utente completo, 73 test verdi, coverage 94%.
 
 ```
 ha-hattrick-integration/
@@ -21,7 +20,7 @@ ha-hattrick-integration/
 │                                  #   pytest-homeassistant-custom-component, requests-oauthlib
 ├── .github/workflows/             # hassfest.yaml, hacs.yaml
 ├── custom_components/hattrick/
-│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.4.0
+│   ├── manifest.json              # domain hattrick, config_flow, cloud_polling, version 0.5.0
 │   ├── const.py                   # endpoint CHPP, CONF_*, FILE_VERSIONS, ON_DEMAND_FILES,
 │   │                              #   SELECTABLE_FILES, intervalli, matchday
 │   ├── api.py                     # HattrickCHPPClient (OAuth 1.0a) + HattrickApiError/AuthError
@@ -45,6 +44,7 @@ ha-hattrick-integration/
 │   ├── strings.json
 │   └── translations/{en,it}.json
 ├── docs/                          # 01-11 documentazione + piano + handoff + richiesta CHPP
+├── examples/                      # dashboard.yaml + automations.yaml di esempio (M5)
 └── tests/
     ├── conftest.py                # sys.path + auto_enable_custom_integrations
     ├── fixtures/                  # 14 XML (aggiunti matchdetails.xml, matchlineup.xml)
@@ -54,12 +54,15 @@ ha-hattrick-integration/
     ├── test_config_flow.py        # 8 test config flow + options
     ├── test_sensor.py             # 11 test sensor/device (incl. diagnostici partita)
     ├── test_services.py           # 10 test servizi (on-demand, set_match_orders, refresh)
+    ├── test_examples.py           # 4 test struttura esempi examples/
     └── test_api.py                # 12 test client CHPP (incl. POST matchorders)
 ```
 
 Commit recenti:
 
 ```
+bdb7561 T22: README utente completo (installazione, config, FAQ, servizi)
+e399964 T21: esempi dashboard Lovelace e automazioni in examples/ + test
 bd6478a T20: servizio refresh + icons.json + servizi in services.yaml/traduzioni
 0cddaad T19: set_match_orders (POST matchorders.xml) + refresh post-invio + test
 6c228e5 T18: sensor diagnostici dettaglio/tattica ultima partita (matchdetails/matchlineup)
@@ -95,11 +98,11 @@ gira su HA 2025.1+ (vedi `hacs.json`); il target di pyproject è py313 (HA 2026)
 
 ```bash
 /tmp/ht-venv/bin/ruff check . && /tmp/ht-venv/bin/ruff format .
-/tmp/ht-venv/bin/pytest -q                                        # 69 test
+/tmp/ht-venv/bin/pytest -q                                        # 73 test
 /tmp/ht-venv/bin/pytest -q --cov=custom_components/hattrick --cov-report=term-missing
 ```
 
-Baseline attesa: **69 passed**, coverage ~94%.
+Baseline attesa: **73 passed**, coverage ~94%.
 
 ## 4. Cosa è già implementato (mappa rápida)
 
@@ -154,16 +157,14 @@ Baseline attesa: **69 passed**, coverage ~94%.
 
 ## 5. Cosa resta da fare (prossimi passi, in ordine)
 
-1. **T21 (M5)**: dashboard Lovelace di esempio (`examples/dashboard.yaml`) +
-   automazioni di esempio (`examples/automations.yaml`), importabili in HA di
-   test senza errori.
-2. **T22 (M5)**: README utente completo: installazione (Marketplace/HACS),
-   configurazione, FAQ.
-3. **M6 (T23–T24)**: test suite completa (coverage > 80%), `diagnostics.py`
-   redatta senza token + test automatico che il dump non contenga credenziali.
-4. **M7–M8**: release v1.0.0, certificazione CHPP (testo pronto in `docs/11`,
-   ma **ricontrollare la policy CHPP sull'AI**: a maggio 2026 Hattrick ha
-   rifiutato un'app generata da AI) — vedi `docs/09-piano-di-lavoro.md`.
+1. **T23 (M6)**: test suite completa (coverage > 80% su `custom_components/hattrick`).
+2. **T24 (M6)**: `diagnostics.py` redatta (dump senza token/segreti) + repair per
+   token revocato + test automatico che il dump non contenga credenziali.
+3. **T25 (M7)**: release `v1.0.0` con release notes; verifica che Marketplace/HACS
+   installino la release in HA pulita.
+4. **T26 (M8)**: certificazione CHPP (testo pronto in `docs/11`, ma
+   **ricontrollare la policy CHPP sull'AI**: a maggio 2026 Hattrick ha rifiutato
+   un'app generata da AI) — vedi `docs/09-piano-di-lavoro.md`.
 
 ## 6. Attenzioni e note tecniche
 
@@ -190,6 +191,6 @@ Baseline attesa: **69 passed**, coverage ~94%.
 
 ## 8. Come riprendere
 
-Chiedere: *"procedi con T21"* (o l'ultimo task in sospeso). Ricostruire il venv
-(sezione 2), lanciare `pytest -q` per confermare la baseline 69 passed, poi
-lavorare al task e committare.
+Chiedere: *"procedi con T23"* (o l'ultimo task in sospeso). Ricostruire il venv
+(sezione 2), lanciare `pytest -q` per confermare la baseline 73 passed, poi
+lavorare al task e committare. Push solo a fine milestone (tag SemVer).
