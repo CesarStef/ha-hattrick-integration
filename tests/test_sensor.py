@@ -16,6 +16,7 @@ from custom_components.hattrick.const import (
     CONF_ACCESS_TOKEN_SECRET,
     CONF_CONSUMER_KEY,
     CONF_CONSUMER_SECRET,
+    CONF_ENABLED_FILES,
     DOMAIN,
 )
 
@@ -33,6 +34,8 @@ FILES = {
     "matches": "matches.xml",
     "arenadetails": "arenadetails.xml",
     "worlddetails": "worlddetails.xml",
+    "matchdetails": "matchdetails.xml",
+    "matchlineup": "matchlineup.xml",
 }
 
 ENTRY_DATA = {
@@ -51,8 +54,10 @@ class MockCHPPClient:
         return ET.fromstring((FIXTURES_DIR / FILES[file]).read_text(encoding="utf-8"))
 
 
-async def _setup_entry(hass: HomeAssistant) -> MockConfigEntry:
-    entry = MockConfigEntry(domain=DOMAIN, unique_id="1234567", data=ENTRY_DATA)
+async def _setup_entry(hass: HomeAssistant, options: dict | None = None) -> MockConfigEntry:
+    entry = MockConfigEntry(
+        domain=DOMAIN, unique_id="1234567", data=ENTRY_DATA, options=options or {}
+    )
     entry.add_to_hass(hass)
     with mock.patch("custom_components.hattrick.HattrickCHPPClient", MockCHPPClient):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -203,3 +208,35 @@ async def test_sensor_server_time(hass: HomeAssistant):
     assert server_time.state == "2026-11-14T09:30:00+00:00"
     assert server_time.attributes["stagione"] == 75
     assert server_time.attributes["prossimo_training"] == "2026-11-15T03:30:00+01:00"
+
+
+async def test_sensor_diagnostici_partita_disabilitati(hass: HomeAssistant):
+    await _setup_entry(hass)
+    assert _state(hass, "dettaglio_ultima_partita").state == "unknown"
+    assert _state(hass, "tattica_ultima_partita").state == "unknown"
+
+
+async def test_sensor_diagnostici_partita(hass: HomeAssistant):
+    await _setup_entry(
+        hass,
+        options={CONF_ENABLED_FILES: [*FILES.keys()]},
+    )
+    dettaglio = _state(hass, "dettaglio_ultima_partita")
+    # rating casa: POR 8 + DIF 7 + CC 9 + ATT 8 = 32
+    assert dettaglio.state == "32"
+    assert dettaglio.attributes["match_id"] == 9001
+    assert dettaglio.attributes["risultato"] == "3-1"
+    assert dettaglio.attributes["casa"] == "Squadra di Test"
+    assert dettaglio.attributes["trasferta"] == "Avversari FC"
+    assert dettaglio.attributes["possesso_casa"] == 55
+    assert dettaglio.attributes["tiri_casa"] == 12
+    assert dettaglio.attributes["rating_casa"]["CC"] == 9
+    assert dettaglio.attributes["rating_trasferta"]["ATT"] == 5
+    assert dettaglio.attributes["meteo"] == "Sunny"
+    assert dettaglio.attributes["spettatori"] == 48000
+    tattica = _state(hass, "tattica_ultima_partita")
+    assert tattica.state == "pressing"
+    assert tattica.attributes["formazione"] == "433"
+    assert tattica.attributes["tattica"] == "pressing"
+    assert tattica.attributes["livello_tattica"] == 5
+    assert tattica.attributes["rating"]["CC"] == 9

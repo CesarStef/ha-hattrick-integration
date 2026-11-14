@@ -141,6 +141,12 @@
       },
       "server_time": {
         "name": "HT server time"
+      },
+      "dettaglio_ultima_partita": {
+        "name": "Last match details"
+      },
+      "tattica_ultima_partita": {
+        "name": "Last match tactic"
       }
     }
   },

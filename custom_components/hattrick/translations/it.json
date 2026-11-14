@@ -141,6 +141,12 @@
       },
       "server_time": {
         "name": "Orario server HT"
+      },
+      "dettaglio_ultima_partita": {
+        "name": "Dettaglio ultima partita"
+      },
+      "tattica_ultima_partita": {
+        "name": "Tattica ultima partita"
       }
     }
   },

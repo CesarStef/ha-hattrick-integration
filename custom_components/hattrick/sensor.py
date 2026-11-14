@@ -374,6 +374,53 @@ SENSORS: tuple[HattrickSensorEntityDescription, ...] = (
         value_fn=lambda data: htt_to_aware(data.world.server_time) if data.world else None,
         attrs_fn=_world_attrs,
     ),
+    HattrickSensorEntityDescription(
+        key="dettaglio_ultima_partita",
+        translation_key="dettaglio_ultima_partita",
+        icon="mdi:chart-box",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: (
+            sum(data.match_details.home_ratings.values()) if data.match_details else None
+        ),
+        attrs_fn=lambda data: (
+            {
+                "match_id": data.match_details.match_id,
+                "data": htt_to_aware(data.match_details.match_date).isoformat(),
+                "casa": data.match_details.home_name,
+                "trasferta": data.match_details.away_name,
+                "risultato": f"{data.match_details.home_goals}-{data.match_details.away_goals}",
+                "possesso_casa": data.match_details.possession_home,
+                "tiri_casa": data.match_details.shots_home,
+                "tiri_trasferta": data.match_details.shots_away,
+                "rating_casa": data.match_details.home_ratings,
+                "rating_trasferta": data.match_details.away_ratings,
+                "meteo": data.match_details.weather,
+                "stadio": data.match_details.arena_name,
+                "spettatori": data.match_details.sold_total,
+                "arbitro": data.match_details.referee_name,
+            }
+            if data.match_details
+            else {}
+        ),
+    ),
+    HattrickSensorEntityDescription(
+        key="tattica_ultima_partita",
+        translation_key="tattica_ultima_partita",
+        icon="mdi:strategy",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda data: data.match_lineup.tactic_label if data.match_lineup else None,
+        attrs_fn=lambda data: (
+            {
+                "match_id": data.match_lineup.match_id,
+                "formazione": data.match_lineup.formation,
+                "tattica": data.match_lineup.tactic_label,
+                "livello_tattica": data.match_lineup.tactic_skill,
+                "rating": data.match_lineup.ratings,
+            }
+            if data.match_lineup
+            else {}
+        ),
+    ),
 )
 
 
