@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HattrickData>
+  <FileName>team</FileName>
+  <Version>1.5</Version>
+  <UserID>1234567</UserID>
+  <FetchedDate>2026-11-14 10:30:00</FetchedDate>
+  <Team>
+    <TeamID>7654321</TeamID>
+    <TeamName>Squadra di Test</TeamName>
+    <TeamSpirit>excellent</TeamSpirit>
+    <Confidence>wonderful</Confidence>
+  </Team>
+</HattrickData>
